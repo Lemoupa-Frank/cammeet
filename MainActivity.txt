@@ -1,0 +1,196 @@
+package camtrack.cmeet;
+
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.tasks.Task;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAuthIOException;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.client.util.DateTime;
+import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.Events;
+
+import java.io.IOException;
+import java.time.ZoneId;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+
+    private static final int RC_SIGN_IN = 9001; Button btn,btn2; TextView txt;
+    private static final String[] SCOPES = {CalendarScopes.CALENDAR_EVENTS}; // Use CALENDAR scope for read-only access
+
+    private GoogleSignInClient googleSignInClient;
+    private GoogleAccountCredential googleAccountCredential;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        btn = findViewById(R.id.button);
+        btn2 = findViewById(R.id.bt2);
+        txt = findViewById(R.id.text);
+        // Set up Google Sign-In and Google Account Credential
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestScopes(new Scope(CalendarScopes.CALENDAR_READONLY))
+                .requestIdToken("127612518635-gq1ckmkdplnb4c3tqtrp40nch0epp1n2.apps.googleusercontent.com")
+                .build();
+        googleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        // Create a GoogleAccountCredential using the GoogleSignInAccount
+        googleAccountCredential = GoogleAccountCredential.usingOAuth2(
+                this, Collections.singleton(CalendarScopes.CALENDAR_READONLY));
+        googleAccountCredential.setSelectedAccountName(null); // Ensure we start with no account selected
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Check if the user is already signed in
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null) {
+            // User is already signed in, use the account to set up the GoogleAccountCredential
+            googleAccountCredential.setSelectedAccount(account.getAccount());
+            Toast.makeText(this, googleAccountCredential.getSelectedAccountName()+" signed in", Toast.LENGTH_SHORT).show();
+            //getEventsForDay(/* specify the date here */);
+            AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>()
+            {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    getEventsForDay(/* specify the date here */);
+                    return null;
+                }
+
+            };
+            btn2.setOnClickListener(v-> task.execute());
+            // A task can be executed just once implying the button can be clicked just once 
+        } else {
+            // User is not signed in, start the sign-in flow
+            Toast.makeText(this, "No User signed in", Toast.LENGTH_SHORT).show();
+            btn.setOnClickListener(v-> signIn());
+        }
+    }
+
+    // Handles the result of the google signactivity started by signin()
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult();
+            if (account != null) {
+                googleAccountCredential.setSelectedAccount(account.getAccount());
+
+            }
+        } catch (Exception e) {
+            Log.d("MainActivity", "handleSignInResult: " + e.getMessage());
+            System.out.println("**********************"+e);
+            txt.setText(e.toString());
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void signIn() {
+        Intent signInIntent = googleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    // Step 3: Use the Calendar API to access and manage events
+
+    private void getEventsForDay() {
+        HttpTransport transport = new NetHttpTransport();
+        JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
+        Calendar service = new Calendar.Builder(transport, jsonFactory, googleAccountCredential)
+                .setApplicationName("xsxsxs")
+                .build();
+
+        try
+        {
+            // Define the start and end of the day you want to retrieve events for
+           // Date startOfDay = /* Set the start of the day */;
+            //Date endOfDay = /* Set the end of the day */;
+
+            // Create a query to retrieve events for the specified time range
+
+            java.time.LocalDate today = java.time.LocalDate.now();
+            java.time.LocalDate starti = today.plusMonths(1);
+            java.time.LocalDate endi = today.plusMonths(1);
+            Date s = Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            Date e = Date.from(starti.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+
+
+            Events events = service.events().list("primary")
+                    .setMaxResults(10)
+                    .setTimeMin(new com.google.api.client.util.DateTime(s))
+                    .setTimeMax(new com.google.api.client.util.DateTime(e))
+                    .setOrderBy("startTime")
+                    .setSingleEvents(true)
+                    .execute();
+
+            // Get the list of events from the query result
+            System.out.println("------------------"+events);
+            List<Event> items = events.getItems();
+//                    .setTimeMin(new com.google.api.client.util.DateTime(2023-27-07))
+//                    .setTimeMax(new com.google.api.client.util.DateTime(2023-2-08))
+            // Process the events as needed (e.g., display them in your app)
+        if (items.isEmpty())
+        {
+            System.out.println("******************No Events ************");
+        }
+        else
+        {
+            for (Event event : items)
+            {
+                DateTime start = event.getStart().getDateTime();
+                if (start == null)
+                {
+                    start = event.getStart().getDate();
+                }
+                System.out.println("Summary: "+ event.getSummary() + "   Start: " + start );
+            }
+            System.out.println("++++++++++++++++ End +++++++++++++++");
+        }
+        } catch (UserRecoverableAuthIOException e) {
+            // Handle user-authorization errors
+            startActivityForResult(e.getIntent(), RC_SIGN_IN);
+            System.out.println("******************************"+ e);
+           // Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+        } // Handle authorization errors
+        catch (IOException e) {
+            // Handle Google API errors
+           // Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+            System.out.println("******************************"+ e);
+        }// Handle other I/O errors
+
+    }
+}

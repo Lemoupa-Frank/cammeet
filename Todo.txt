@@ -1,0 +1,37 @@
+1) Puzzle on how you will make an admin in the System
+
+2)The account of every User should have the below attributes 
+ son nom
+ son email
+ son department
+ son Numéro de telephone
+
+3)They should be a restriction to read only rights if your not the owner of a meeting
+
+4)Meeting are created by getting the neccessary details from google meet which are 
+ The owner of the meeting 
+ the attendees of the meeting 
+ the reason for the meeting 
+ The date of the meeting 
+ 
+5)The above should be flexible to permit modifications of the meetings from the owner of the meeting (edit attendees, add owner, cancel meeting)
+ Think of possibility of editing the meeting in your application updating it to google calendar and then to  your database.
+ This ensure that both databases are refexive
+
+6)Attendees should be able to sign after a meeting has taken place, this isn't supported by google calendar so will taken charge by our database 
+
+7)For a set timeframe users should be able to view all the meetings in which there are attendees
+
+8)That said i need to make what i have done to be validated so far 
+
+9)Puzzle on how you will store changes in done in meet, what chages where done and by who
+
+10)Modificztions of the database to enable add the spring tables 
+
+11)Studying OPenApi this takes precedence today (priority)
+
+12)Create the database
+
+13)create the spring service responsible for communicating with the client and databbase (priority)  
+
+14)Remember you have to do the the wensite version

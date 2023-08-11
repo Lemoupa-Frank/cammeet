@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">cammeet</string>
+    <string name="signin">Connexion</string>
+    <string name="click">Réunion</string>
+    <string name="TrustMessage">Veuillez cliquer pour vous connecter avec votre adresse e-mail professionnelle</string>
+    <string name="prompt_email">E-mail</string>
+    <string name="prompt_password">mot de passe</string>
+    <string name="action_sign_in">Inscription</string>
+    <string name="action_sign_in_short">Connexion</string>
+    <string name="welcome">Bienvenue</string>
+    <string name="invalid_username">nom d\'utilisateur invalide</string>
+    <string name="invalid_password">Mot de passe incorrect</string>
+    <string name="login_failed">échec de la connexion</string>
+    <string name="create_account">Creér un Compte</string>
+    <string name="User_Name">Name</string>
+    <string name="emailHint">user108@camtrack.net</string>
+    <string name="phone">680846007</string>
+    <string name="grant_event_write_permission">Vous pouvez modifier cet événement</string>
+    <string name="refuse_event_write_permission">Vous n\'êtes pas le Owner de cet événement</string>
+    <string name="title">Titre</string>>
+    <string name="location_image_view">location</string>
+    <string name="clear_image_view">clear image view</string>
+    <string name="admin_image_view">admin image view</string>
+    <string name="edit_image_view">edit image view</string>
+    <string name="Already_hava_account">Vous avez déjà un compte</string>
+</resources>
+

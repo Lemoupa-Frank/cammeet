@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">cammeet</string>
+    <string name="signin">sign in</string>
+    <string name="click">MEETINGS</string>
+    <string name="TrustMessage">Please Click To Sign in with your Office mail</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign up or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">welcome</string>
+    <string name="invalid_username">Invalid user name</string>
+    <string name="invalid_password">Incorrect Password</string>
+    <string name="login_failed">Login Failed</string>
+    <string name="create_account">create account</string>
+    <string name="User_Name">Name</string>
+    <string name="emailHint">user108@camtrack.net</string>
+    <string name="phone">680846007</string>
+    <string name="grant_event_write_permission">You Can Edit This Event</string>
+    <string name="refuse_event_write_permission">You are not the Owner of This Event</string>
+    <string name="title">Title</string>
+    <string name="location_image_view">location</string>
+    <string name="clear_image_view">clear image view</string>
+    <string name="admin_image_view">admin image view</string>
+    <string name="edit_image_view">edit image view</string>
+    <string name="Already_hava_account">Already have an account</string>
+    <string-array name="Departments">
+        <item>Informatique</item>
+        <item>Service Après-vente</item>
+    </string-array>
+
+</resources>
+
