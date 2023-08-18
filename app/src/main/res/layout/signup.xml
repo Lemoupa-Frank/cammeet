@@ -43,8 +43,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="@string/emailHint"
-        android:autofilledHighlight = "@color/teal_200"
-        android:autofillHints="emailAddress"
+        android:autofillHints="Text"
         android:inputType="textEmailAddress"
         app:layout_constraintBottom_toTopOf="@+id/phone"
         app:layout_constraintEnd_toEndOf="parent"
@@ -56,7 +55,7 @@
     <EditText
         android:id="@+id/phone"
         android:hint="@string/phone"
-        android:autofillHints="@string/phone"
+        android:autofillHints="phone"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:inputType="phone"

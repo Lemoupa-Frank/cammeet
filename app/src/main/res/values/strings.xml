@@ -13,8 +13,8 @@
     <string name="login_failed">Login Failed</string>
     <string name="create_account">create account</string>
     <string name="User_Name">Name</string>
-    <string name="emailHint">user108@camtrack.net</string>
-    <string name="phone">680846007</string>
+    <string name="emailHint">E-mails</string>
+    <string name="phone">phone number</string>
     <string name="grant_event_write_permission">You Can Edit This Event</string>
     <string name="refuse_event_write_permission">You are not the Owner of This Event</string>
     <string name="title">Title</string>
@@ -23,6 +23,11 @@
     <string name="admin_image_view">admin image view</string>
     <string name="edit_image_view">edit image view</string>
     <string name="Already_hava_account">Already have an account</string>
+    <string name="signnamecontentDescription">Name place holder</string>
+    <string name="signemailcontentDescription">email place holder</string>
+    <string name="signphonecontentDescription">phone number place holder</string>
+    <string name="signpasswordcontentDescription">password place holder</string>
+    <string name="EnterFiled"> Please Enter Field </string>
     <string-array name="Departments">
         <item>Informatique</item>
         <item>Service Après-vente</item>
