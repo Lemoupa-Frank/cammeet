@@ -1,42 +1,22 @@
 package camtrack.cmeet.activities.login.data;
 
+import android.content.SharedPreferences;
+
 import camtrack.cmeet.activities.login.model.User;
 
 public class cache_user {
-   public static User Cuser;
-
-    /**
-     * Gets the User from registered in the model class
-     * @param user
-     */
-    public void setLoggedInUser(User user) {
-        this.Cuser = user;
-    }
-
     /**
      * Store a valid User in the apps  cache directory on Login, the user details are gotten from the user Model
-     * @param user
-     * @return
+     * @param editor sharedpreference editor
+     * @param user User of session
      */
-    public boolean cache_user(User user)
+    public static void cache_a_user(SharedPreferences.Editor editor, User user)
     {
-        if(true)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        editor.putString("userId", user.getUserId());
+        editor.putString("displayName", user.getDisplayName());
+        editor.putString("number", user.getNumber());
+        editor.putString("department", user.getDepartment());
+        editor.apply();
     }
 
-    /**
-     * gets the user from the apps  cached directory
-     * @return
-     */
-    public User getCuser()
-    {
-        //gets user from the cached directory
-        return getCuser();
-    }
 }

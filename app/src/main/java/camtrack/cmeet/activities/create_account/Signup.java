@@ -4,10 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Patterns;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -33,6 +36,7 @@ public class Signup extends AppCompatActivity {
     SignupBinding signupbinding;
     Spinner Department_Spinner;
     EditText[] Editform;
+    private ProgressBar progressBar;
 
     Retrofit retrofitobj;
     Request_Route request_route;
@@ -47,6 +51,7 @@ public class Signup extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         signupbinding = SignupBinding.inflate(getLayoutInflater());
         Department_Spinner = signupbinding.department;
+        progressBar = signupbinding.circularProgressBar;
         Editform = new EditText[]{signupbinding.username, signupbinding.Email, signupbinding.phone, signupbinding.password};
         set_spinner(Department_Spinner,Signup.this, R.array.Departments);
         retrofitobj = Retrofit_Base_Class.getClient();
@@ -69,7 +74,7 @@ public class Signup extends AppCompatActivity {
             }
             else
             {
-
+                Toast.makeText(Signup.this, "Sorry User Could not be Created", Toast.LENGTH_LONG).show();
             }
         });
         signupbinding.loginSignPage.setOnClickListener(c->
@@ -104,17 +109,31 @@ public class Signup extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
     }
-    private boolean isAllEditTextFilled(EditText[] editTexts)
+    public boolean isAllEditTextFilled(EditText[] editTexts)
     {
         boolean isfilled = true;
-        String A = getString(R.string.EnterFiled);
         for (EditText editText : editTexts)
         {
             if (editText.getText().length() == 0)
             {
-                Toast.makeText(Signup.this, A +" "+ editText.getHint(), Toast.LENGTH_SHORT).show();
                 shakeEditText(editText);
                 isfilled = false;
+            }
+            else if(editText.getInputType() == 33)
+            {
+              if(!Patterns.EMAIL_ADDRESS.matcher(editText.getText().toString()).matches())
+              {
+                  shakeEditText(editText);
+                  isfilled = false;
+              }
+            }
+            else if(editText.getInputType() == 3)
+            {
+                if(!Patterns.PHONE.matcher(editText.getText().toString()).matches())
+                {
+                    shakeEditText(editText);
+                    isfilled = false;
+                }
             }
         }
         return isfilled;
@@ -139,6 +158,7 @@ public class Signup extends AppCompatActivity {
     }
     public void Creat_User(Request_Route RR, Retrofit rbc)
     {
+        progressBar.setVisibility(View.VISIBLE);
         RR = rbc.create(Request_Route.class);
         Call<Void> CreateUserCall =RR.create_User(newuser);
         CreateUserCall.enqueue(new Callback<Void>() {
@@ -147,11 +167,12 @@ public class Signup extends AppCompatActivity {
             {
                 if(response.isSuccessful())
                 {
-                    Toast.makeText(Signup.this, newuser.toString(), Toast.LENGTH_LONG).show();
-
+                    progressBar.setVisibility(View.INVISIBLE);
+                    Toast.makeText(Signup.this, "User Created", Toast.LENGTH_LONG).show();
                 }
                 else
                 {
+                    progressBar.setVisibility(View.INVISIBLE);
                     Toast.makeText(Signup.this, response.toString(), Toast.LENGTH_LONG).show();
                 }
             }
@@ -159,7 +180,8 @@ public class Signup extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t)
             {
-                Toast.makeText(Signup.this, "On failure Exception " + t.toString(), Toast.LENGTH_LONG).show();
+                progressBar.setVisibility(View.INVISIBLE);
+                Toast.makeText(Signup.this, R.string.Server_down, Toast.LENGTH_LONG).show();
             }
         });
     }

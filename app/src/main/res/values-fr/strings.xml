@@ -27,6 +27,7 @@
     <string name="signemailcontentDescription">espace réservé aux e-mails</string>
     <string name="signphonecontentDescription">espace réservé au numéro de téléphone</string>
     <string name="signpasswordcontentDescription">espace réservé au mot de passe</string>
-    <string name="EnterFiled"> Veuillez saisir le champ </string>
+    <string name="EnterFiled"> Veuillez saisir tous les champs requis</string>
+    <string name="Server_down"> Impossible d\'accéder au serveur </string>
 </resources>
 

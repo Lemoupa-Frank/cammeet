@@ -27,7 +27,8 @@
     <string name="signemailcontentDescription">email place holder</string>
     <string name="signphonecontentDescription">phone number place holder</string>
     <string name="signpasswordcontentDescription">password place holder</string>
-    <string name="EnterFiled"> Please Enter Field </string>
+    <string name="EnterFiled"> Please Enter all Fields as required </string>
+    <string name="Server_down"> Cannot connect to the server </string>
     <string-array name="Departments">
         <item>Informatique</item>
         <item>Service Après-vente</item>
