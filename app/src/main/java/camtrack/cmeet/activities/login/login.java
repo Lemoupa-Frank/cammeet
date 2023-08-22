@@ -50,8 +50,6 @@ public class login extends AppCompatActivity {
 
         binding_log.login.setOnClickListener(v->
         {
-            I = new Intent(login.this, MainActivity.class);
-            startActivity(I);
             if (signup.isAllEditTextFilled(Editform))
             {
                 LOG(retrofitobj);
