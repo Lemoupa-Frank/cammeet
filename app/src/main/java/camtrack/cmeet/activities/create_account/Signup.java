@@ -168,7 +168,7 @@ public class Signup extends AppCompatActivity {
                 if(response.isSuccessful())
                 {
                     progressBar.setVisibility(View.INVISIBLE);
-                    Toast.makeText(Signup.this, "User Created", Toast.LENGTH_LONG).show();
+                    Toast.makeText(Signup.this, R.string.TrustMessage, Toast.LENGTH_LONG).show();
                 }
                 else
                 {

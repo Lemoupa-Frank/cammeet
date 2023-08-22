@@ -50,6 +50,8 @@ public class login extends AppCompatActivity {
 
         binding_log.login.setOnClickListener(v->
         {
+            I = new Intent(login.this, MainActivity.class);
+            startActivity(I);
             if (signup.isAllEditTextFilled(Editform))
             {
                 LOG(retrofitobj);
@@ -94,6 +96,7 @@ public class login extends AppCompatActivity {
             {
                 progressBar.setVisibility(View.INVISIBLE);
                 Toast.makeText(login.this, R.string.Server_down, Toast.LENGTH_LONG).show();
+                //Set t to differentiate when server is not reachable and false login and timeout
             }
         });
 

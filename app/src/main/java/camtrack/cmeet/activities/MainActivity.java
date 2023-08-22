@@ -1,8 +1,6 @@
 package camtrack.cmeet.activities;
-//  Client ID was used instead of reading json file
-// Add the ability to set a pin to login
-// Also think about storing credentials in a valid class so that there can be access from needed classes
-// Clicking meeting twice at once generate multiple instances of meetings activity
+
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -50,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private GoogleSignInClient googleSignInClient;
     private GoogleAccountCredential googleAccountCredential;
     private ProgressBar progressBar;
+    GoogleSignInAccount account;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         decorView.setSystemUiVisibility(uiOptions);
         setContentView(activityMainBinding.getRoot());
         progressBar = findViewById(R.id.circularProgressBar);
+        account = GoogleSignIn.getLastSignedInAccount(this);
         // Set up Google Sign-In and Google Account Credential
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -67,34 +67,14 @@ public class MainActivity extends AppCompatActivity {
                 .requestIdToken("127612518635-gq1ckmkdplnb4c3tqtrp40nch0epp1n2.apps.googleusercontent.com")
                 .build();
         googleSignInClient = GoogleSignIn.getClient(this, gso);
-
+        activityMainBinding.bt2.setOnClickListener(v-> async());
         // Create a GoogleAccountCredential using the GoogleSignInAccount
-        googleAccountCredential = GoogleAccountCredential.usingOAuth2(
-                this, Collections.singleton(CalendarScopes.CALENDAR_READONLY));
+        googleAccountCredential = GoogleAccountCredential.usingOAuth2(this, Collections.singleton(CalendarScopes.CALENDAR_READONLY));
         googleAccountCredential.setSelectedAccountName(null); // Ensure we start with no account selected
+        SignIn_Handler();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // Check if the user is already signed in
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if (account != null)
-        {
-            // User is already signed in, use the account to set up the GoogleAccountCredential
-            googleAccountCredential.setSelectedAccount(account.getAccount());
-            Toast.makeText(this, googleAccountCredential.getSelectedAccountName()+" signed in", Toast.LENGTH_SHORT).show();
-            activityMainBinding.bt2.setOnClickListener(v-> async());
-        } else
-        {
-            // User is not signed in, start the sign-in flow
-            Toast.makeText(this, "No User signed in", Toast.LENGTH_SHORT).show();
-            activityMainBinding.button.setOnClickListener(
-                    v-> signIn()
-            );
-        }
-        // Restricting the onClick to the if means it works only on start of the application
-    }
+
 
     // Handles the result of the google signactivity started by signin()
     @Override
@@ -115,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             Log.d("MainActivity", "handleSignInResult: " + e.getMessage());
-            System.out.println("**************Line 109 Mainactivity"+e);
+            System.out.println("**************Line 96 Mainactivity"+e);
             activityMainBinding.text.setText(e.toString());
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -132,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         HttpTransport transport = new NetHttpTransport();
         JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
         Calendar service = new Calendar.Builder(transport, jsonFactory, googleAccountCredential)
-                .setApplicationName("xsxsxs")
+                .setApplicationName("cammeet")
                 .build();
 
 
@@ -191,10 +171,16 @@ public class MainActivity extends AppCompatActivity {
         catch (IOException e) {
             // Handle Google API errors
            //Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show().;
-            System.out.println("*****************IOException*************"+ e);
+            System.out.println("*****************IOException************* line 174 "+ e);
         }// Handle other I/O errors
         return items;
     }
+
+    /**
+     * A function that maes an asynchronous call to get events
+     * the function sets a progressbar before creating the
+     * new thread
+     */
     public void async()
     {
         progressBar.setVisibility(View.VISIBLE);
@@ -220,5 +206,34 @@ public class MainActivity extends AppCompatActivity {
     public static List<Event> items()
     {
         return items;
+    }
+
+    /**
+     * Check if there is a google account signed in if there  is none
+     * it starts a signin flow
+     */
+    public void SignIn_Handler()
+    {
+        if (account != null)
+        {
+            // User is already signed in, use the account to set up the GoogleAccountCredential
+            googleAccountCredential.setSelectedAccount(account.getAccount());
+            Toast.makeText(this, googleAccountCredential.getSelectedAccountName()+" signed in", Toast.LENGTH_SHORT).show();
+        } else
+        {
+            // User is not signed in, start the sign-in flow
+            Toast.makeText(this, "No User signed in", Toast.LENGTH_SHORT).show();
+            signIn();
+            //activityMainBinding.button.setOnClickListener(v-> signIn());
+        }
+    }
+
+    /**
+     * This changes the google account which is signed in
+     * and logs the user out
+     */
+    protected void change_account()
+    {
+
     }
 }

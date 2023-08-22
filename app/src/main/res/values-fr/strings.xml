@@ -29,5 +29,6 @@
     <string name="signpasswordcontentDescription">espace réservé au mot de passe</string>
     <string name="EnterFiled"> Veuillez saisir tous les champs requis</string>
     <string name="Server_down"> Impossible d\'accéder au serveur </string>
+    <string name="account_created"> Votre compte a été créé </string>
 </resources>
 
