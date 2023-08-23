@@ -1,16 +1,15 @@
 package camtrack.cmeet.activities.create_account;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Patterns;
-import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -18,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import camtrack.cmeet.R;
+import camtrack.cmeet.activities.cmeet_delay;
 import camtrack.cmeet.activities.login.login;
 import camtrack.cmeet.activities.login.model.User;
 import camtrack.cmeet.databinding.SignupBinding;
@@ -36,7 +36,7 @@ public class Signup extends AppCompatActivity {
     SignupBinding signupbinding;
     Spinner Department_Spinner;
     EditText[] Editform;
-    private ProgressBar progressBar;
+    Dialog delaydialog;
 
     Retrofit retrofitobj;
     Request_Route request_route;
@@ -51,7 +51,6 @@ public class Signup extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         signupbinding = SignupBinding.inflate(getLayoutInflater());
         Department_Spinner = signupbinding.department;
-        progressBar = signupbinding.circularProgressBar;
         Editform = new EditText[]{signupbinding.username, signupbinding.Email, signupbinding.phone, signupbinding.password};
         set_spinner(Department_Spinner,Signup.this, R.array.Departments);
         retrofitobj = Retrofit_Base_Class.getClient();
@@ -65,11 +64,6 @@ public class Signup extends AppCompatActivity {
                         , signupbinding.username.getText().toString()
                         , signupbinding.phone.getText().toString()
                         , signupbinding.department.getSelectedItem().toString(),signupbinding.password.getText().toString());
-                editor.putString("userId", newuser.getUserId());
-                editor.putString("displayName", newuser.getDisplayName());
-                editor.putString("number", newuser.getNumber());
-                editor.putString("department", newuser.getDepartment());
-                editor.apply();
                 Creat_User(request_route,retrofitobj);
             }
             else
@@ -158,7 +152,8 @@ public class Signup extends AppCompatActivity {
     }
     public void Creat_User(Request_Route RR, Retrofit rbc)
     {
-        progressBar.setVisibility(View.VISIBLE);
+        delaydialog = cmeet_delay.displayAlertDialog(this);
+        delaydialog.show();
         RR = rbc.create(Request_Route.class);
         Call<Void> CreateUserCall =RR.create_User(newuser);
         CreateUserCall.enqueue(new Callback<Void>() {
@@ -167,12 +162,12 @@ public class Signup extends AppCompatActivity {
             {
                 if(response.isSuccessful())
                 {
-                    progressBar.setVisibility(View.INVISIBLE);
+                    delaydialog.cancel();
                     Toast.makeText(Signup.this, R.string.TrustMessage, Toast.LENGTH_LONG).show();
                 }
                 else
                 {
-                    progressBar.setVisibility(View.INVISIBLE);
+                    delaydialog.cancel();
                     Toast.makeText(Signup.this, response.toString(), Toast.LENGTH_LONG).show();
                 }
             }
@@ -180,7 +175,7 @@ public class Signup extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t)
             {
-                progressBar.setVisibility(View.INVISIBLE);
+                delaydialog.cancel();
                 Toast.makeText(Signup.this, R.string.Server_down, Toast.LENGTH_LONG).show();
             }
         });

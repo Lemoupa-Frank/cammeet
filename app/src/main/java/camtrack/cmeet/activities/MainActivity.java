@@ -9,6 +9,7 @@ import static camtrack.cmeet.activities.DatePickerFragment.startdatetemp;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
@@ -58,9 +59,9 @@ public class MainActivity extends AppCompatActivity {
     public TextView starttext, endtext;
     ActivityMainBinding activityMainBinding;
     GoogleSignInAccount account;
+    SharedPreferences sharedPreferences;
 
-
-    Dialog dialog;
+    Dialog dialog, delaydialog;
     Events events;
     private GoogleSignInClient googleSignInClient;
     private GoogleAccountCredential googleAccountCredential;
@@ -76,15 +77,17 @@ public class MainActivity extends AppCompatActivity {
         dialog = new Dialog(this);
         activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
         dialogBinding = DialogBinding.inflate(getLayoutInflater());
-
-
-        View decorView = getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-        decorView.setSystemUiVisibility(uiOptions);
-        setContentView(activityMainBinding.getRoot());
+        sharedPreferences= getSharedPreferences("User", Context.MODE_PRIVATE);
         progressBar = findViewById(R.id.circularProgressBar);
-
         account = GoogleSignIn.getLastSignedInAccount(this);
+
+
+
+
+        setContentView(activityMainBinding.getRoot());
+
+
+        //cmeet_alert.displayAlertDialog(this, sharedPreferences.getString("displayName",""));
         // Set up Google Sign-In and Google Account Credential
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -223,7 +226,6 @@ public class MainActivity extends AppCompatActivity {
         if (account != null) {
             // User is already signed in, use the account to set up the GoogleAccountCredential
             googleAccountCredential.setSelectedAccount(account.getAccount());
-            Toast.makeText(this, googleAccountCredential.getSelectedAccountName() + " signed in", Toast.LENGTH_SHORT).show();
         } else {
             // User is not signed in, start the sign-in flow
             Toast.makeText(this, "No User signed in", Toast.LENGTH_SHORT).show();
@@ -278,4 +280,21 @@ public class MainActivity extends AppCompatActivity {
         newFragment.show(getSupportFragmentManager(), "EndDate");
     }
 
+    public void dialog_canel(View view)
+    {
+        dialog.cancel();
+    }
+    public void dialog_validate()
+    {
+        if(startdatetemp != null && enddatetemp != null)
+        {
+            startdate = startdatetemp;
+            enddate = enddatetemp;
+            dialog.cancel();
+        }
+        else
+        {
+            Toast.makeText(this, googleAccountCredential.getSelectedAccountName() + " signed in", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

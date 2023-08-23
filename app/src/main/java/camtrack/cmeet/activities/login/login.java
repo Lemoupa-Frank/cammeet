@@ -40,7 +40,7 @@ public class login extends AppCompatActivity {
         sharedPreferences= getSharedPreferences("User", Context.MODE_PRIVATE);
         binding_log = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding_log.getRoot());
-        sharedPreferences= getSharedPreferences("User", Context.MODE_PRIVATE);
+
         editor = sharedPreferences.edit();
         progressBar = binding_log.circularProgressBar;
         retrofitobj = Retrofit_Base_Class.getClient();
