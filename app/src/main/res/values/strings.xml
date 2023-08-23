@@ -30,10 +30,14 @@
     <string name="EnterFiled"> Please Enter all Fields as required </string>
     <string name="Server_down"> Cannot connect to the server </string>
     <string name="account_created"> your account has been created  </string>
+    <string name="choose_time_period"> choose a period </string>
+    <string name="starting_from"> Select Start Time </string>
+    <string name="end_time"> Select End Time </string>
+    <string name="validate"> validate </string>
+    <string name="cancel"> cancel </string>
     <string-array name="Departments">
         <item>Informatique</item>
         <item>Service Après-vente</item>
     </string-array>
 
 </resources>
-

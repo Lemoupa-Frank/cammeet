@@ -30,5 +30,9 @@
     <string name="EnterFiled"> Veuillez saisir tous les champs requis</string>
     <string name="Server_down"> Impossible d\'accéder au serveur </string>
     <string name="account_created"> Votre compte a été créé </string>
+    <string name="choose_time_period"> choisir une période </string>
+    <string name="starting_from">  Sélectionnez l\'heure de début  </string>
+    <string name="end_time"> Sélectionnez l\'heure de fin </string>
+    <string name="validate"> valider </string>
+    <string name="cancel"> Annuler </string>
 </resources>
-
