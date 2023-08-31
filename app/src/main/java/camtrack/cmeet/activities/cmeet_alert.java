@@ -10,11 +10,12 @@ import androidx.appcompat.app.AlertDialog;
 
 public class cmeet_alert {
 
-    public static void displayAlertDialog(Context context, String userName)
+    public static void displayAlertDialog(Context context, String Message)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setMessage("Welcome, " + userName + "!");
-        AlertDialog alertDialog = builder.create();
+        AlertDialog alertDialog = builder
+                .setMessage(Message)
+                .create();
         alertDialog.getWindow().setGravity(Gravity.TOP);
         alertDialog.show();
         Handler handler = new Handler();
@@ -25,6 +26,6 @@ public class cmeet_alert {
                     alertDialog.dismiss();
                 }
             }
-        }, 6000);
+        }, 3000);
     }
 }

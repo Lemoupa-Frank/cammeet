@@ -16,6 +16,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.errorprone.annotations.Var;
+
 import camtrack.cmeet.R;
 import camtrack.cmeet.activities.cmeet_delay;
 import camtrack.cmeet.activities.login.login;
@@ -40,15 +42,11 @@ public class Signup extends AppCompatActivity {
 
     Retrofit retrofitobj;
     Request_Route request_route;
-
     User newuser;
-    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sharedPreferences= getSharedPreferences("User", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
         signupbinding = SignupBinding.inflate(getLayoutInflater());
         Department_Spinner = signupbinding.department;
         Editform = new EditText[]{signupbinding.username, signupbinding.Email, signupbinding.phone, signupbinding.password};
@@ -60,10 +58,6 @@ public class Signup extends AppCompatActivity {
         {
             if(isAllEditTextFilled(Editform))
             {
-                NewUser(signupbinding.Email.getText().toString()
-                        , signupbinding.username.getText().toString()
-                        , signupbinding.phone.getText().toString()
-                        , signupbinding.department.getSelectedItem().toString(),signupbinding.password.getText().toString());
                 Creat_User(request_route,retrofitobj);
             }
             else
@@ -76,18 +70,6 @@ public class Signup extends AppCompatActivity {
             Intent i  = new Intent(Signup.this, login.class);
             startActivity(i);
         });
-    }
-
-    /**
-     * Uses the Model class found in Login to create a new user
-     * @param userId - The unique identifier of the user which is the email
-     * @param displayName - The name of the user too creat account
-     * @param number - The phone number of the user
-     * @param department- The Department of the user
-     */
-    public void NewUser(String userId, String displayName, String number,String department, String password)
-    {
-        this.newuser = new User(userId,displayName,number,department, password);
     }
 
     /**Instantiating a spinner using an array in Values/Strings
@@ -152,7 +134,7 @@ public class Signup extends AppCompatActivity {
     }
     public void Creat_User(Request_Route RR, Retrofit rbc)
     {
-        delaydialog = cmeet_delay.displayAlertDialog(this);
+        delaydialog = cmeet_delay.delaydialogCircular(this);
         delaydialog.show();
         RR = rbc.create(Request_Route.class);
         Call<Void> CreateUserCall =RR.create_User(newuser);
@@ -164,6 +146,8 @@ public class Signup extends AppCompatActivity {
                 {
                     delaydialog.cancel();
                     Toast.makeText(Signup.this, R.string.TrustMessage, Toast.LENGTH_LONG).show();
+                    Intent t = new Intent(Signup.this,login.class);
+                    startActivity(t);
                 }
                 else
                 {

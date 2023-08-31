@@ -5,6 +5,7 @@ import static camtrack.cmeet.activities.DatePickerFragment.enddate;
 import static camtrack.cmeet.activities.DatePickerFragment.enddatetemp;
 import static camtrack.cmeet.activities.DatePickerFragment.startdate;
 import static camtrack.cmeet.activities.DatePickerFragment.startdatetemp;
+import static camtrack.cmeet.activities.login.data.cache_user.cache_a_user;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -17,12 +18,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -40,74 +42,133 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.Events;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 import camtrack.cmeet.R;
+import camtrack.cmeet.Request_Maker;
+import camtrack.cmeet.activities.Events.MainActivityEventFragment;
+import camtrack.cmeet.activities.Events.event_model;
+import camtrack.cmeet.activities.login.model.User;
 import camtrack.cmeet.databinding.ActivityMainBinding;
 import camtrack.cmeet.databinding.DialogBinding;
+import camtrack.cmeet.retrofit.Request_Route;
+import camtrack.cmeet.retrofit.Retrofit_Base_Class;
+import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 9001;
     //Load previous events from cache data or store some default event
-    public static List<Event> items = null;
+    public static List<event_model> cmeet_event_list = null; public static List<Event> items = null;
+    MutableLiveData<List<Event>> items_listener = new MutableLiveData<>();
+   // MutableLiveData<List<event_model>> cmeet_event_list_listener = new MutableLiveData<>();
+    Request_Route request_route_instqnce; Retrofit retrofitobj;
     public DialogBinding dialogBinding;
     public TextView starttext, endtext;
     ActivityMainBinding activityMainBinding;
     GoogleSignInAccount account;
     SharedPreferences sharedPreferences;
-
+    public static  String userid;
     Dialog dialog, delaydialog;
     Events events;
     private GoogleSignInClient googleSignInClient;
-    private GoogleAccountCredential googleAccountCredential;
-    private ProgressBar progressBar;
+    private  GoogleAccountCredential googleAccountCredential;
+    public static User user;
 
     public static List<Event> items() {
         return items;
     }
-
+    public static List<event_model> get_cmeet_event_list() {
+        return cmeet_event_list;
+    }
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
-        dialog = new Dialog(this);
-        activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
-        dialogBinding = DialogBinding.inflate(getLayoutInflater());
-        sharedPreferences= getSharedPreferences("User", Context.MODE_PRIVATE);
-        progressBar = findViewById(R.id.circularProgressBar);
-        account = GoogleSignIn.getLastSignedInAccount(this);
-
-
-
-
-        setContentView(activityMainBinding.getRoot());
-
 
         //cmeet_alert.displayAlertDialog(this, sharedPreferences.getString("displayName",""));
         // Set up Google Sign-In and Google Account Credential
+        account = GoogleSignIn.getLastSignedInAccount(this);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestScopes(new Scope(CalendarScopes.CALENDAR_READONLY))
                 .requestIdToken("127612518635-gq1ckmkdplnb4c3tqtrp40nch0epp1n2.apps.googleusercontent.com")
                 .build();
         googleSignInClient = GoogleSignIn.getClient(this, gso);
+        // Create a GoogleAccountCredential using the GoogleSignInAccount
+        googleAccountCredential = GoogleAccountCredential.usingOAuth2(this, Collections.singleton(CalendarScopes.CALENDAR_READONLY));
+        // Ensure we start with no account selected
+        googleAccountCredential.setSelectedAccountName(null);
+        // Resposibles of starting the authorieation flow to get token
+
+        SignIn_Handler();
+
+        // Retrieving user stored in the cache each time this activity is created
+        {
+            sharedPreferences= getSharedPreferences("User", Context.MODE_PRIVATE);
+            user =  cache_a_user(null,user,sharedPreferences);
+        }
 
 
+        //Initializing variables
+        {
+            dialog = new Dialog(this);
+            activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
+            dialogBinding = DialogBinding.inflate(getLayoutInflater());
+            delaydialog = cmeet_delay.delaydialogCircular(this);
+        }
+
+
+
+        items_listener.observe(this, new Observer<List<Event>>() {
+            @Override
+            public void onChanged(List<Event> events) {
+                {
+                    if(events != null)
+                    {
+                        {
+                            retrofitobj = Retrofit_Base_Class.getClient();
+                            Request_Maker request_maker = new Request_Maker();
+                            cmeet_event_list = cmeet_from_googleEvent(items, MainActivity.this);
+                            request_maker.store_todays_meets(retrofitobj,MainActivity.this,cmeet_event_list);
+                        }
+                        MainActivityEventFragment fragment = new MainActivityEventFragment();
+                        getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.MainActivityFrag, fragment)
+                                .commit();
+                    }
+                }
+            }
+        });
+
+        async();
+
+        setContentView(activityMainBinding.getRoot());
         activityMainBinding.bt2.setOnClickListener(v -> async());
-        activityMainBinding.button.setOnClickListener(v -> {
+        activityMainBinding.button.setOnClickListener(v ->
+        {
             Dialog event_dial;
             event_dial = openDialog(this);
+            if (items != null)
+            {
+                MainActivityEventFragment fragment = new MainActivityEventFragment();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.MainActivityFrag, fragment)
+                        .commit();
+            }
             event_dial.show();
         });
 
-        // Create a GoogleAccountCredential using the GoogleSignInAccount
-        googleAccountCredential = GoogleAccountCredential.usingOAuth2(this, Collections.singleton(CalendarScopes.CALENDAR_READONLY));
-        googleAccountCredential.setSelectedAccountName(null); // Ensure we start with no account selected
-        SignIn_Handler();
+
+
+
     }
 
     // Handles the result of the google signactivity started by signin()
@@ -128,13 +189,11 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             Log.d("MainActivity", "handleSignInResult: " + e.getMessage());
-            System.out.println("**************Line 96 Mainactivity" + e);
-            activityMainBinding.text.setText(e.toString());
+            System.out.println("**************Line 139 Mainactivity" + e);
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
-    // Step 3: Use the Calendar API to access and manage events
 
     private void signIn() {
         Intent signInIntent = googleSignInClient.getSignInIntent();
@@ -163,8 +222,7 @@ public class MainActivity extends AppCompatActivity {
             items = events.getItems();
             //items.get(0).getOrganizer();
             System.out.println("------------------" + items);
-            //items.get(1).getSummary();
-            // Process the events as needed (e.g., display them in your app)
+
             if (items.isEmpty()) {
                 System.out.println("******************No Events ************");
                 return null;
@@ -200,20 +258,16 @@ public class MainActivity extends AppCompatActivity {
      * new thread
      */
     public void async() {
-        progressBar.setVisibility(View.VISIBLE);
+        //delaydialog.show();
         new Thread(() ->
         {
-            final List<Event> E = getEventsForDay(startdate, enddate);
-            items = E;
-            activityMainBinding.text.post(() -> activityMainBinding.text.setText(E != null ? "Events found" : "No Events"));
-            progressBar.post(() -> progressBar.setVisibility(View.INVISIBLE));
-            if (items == null) {
+            items = getEventsForDay(startdate, enddate);
+            items_listener.postValue(items);
+
+           // delaydialog.cancel();
+            if (items == null)
+            {
                 activityMainBinding.getRoot().post(() -> Toast.makeText(MainActivity.this, "Unable to Load events", Toast.LENGTH_LONG).show());
-                //inflate Dialog
-                //you will have two checks if null get cache values if cache are null then display toast
-            } else {
-                Intent I = new Intent(MainActivity.this, camtrack.cmeet.activities.Events.MainActivity.class);
-                startActivity(I);
             }
         }).start();
     }
@@ -226,11 +280,12 @@ public class MainActivity extends AppCompatActivity {
         if (account != null) {
             // User is already signed in, use the account to set up the GoogleAccountCredential
             googleAccountCredential.setSelectedAccount(account.getAccount());
+            userid = account.getEmail();
         } else {
             // User is not signed in, start the sign-in flow
             Toast.makeText(this, "No User signed in", Toast.LENGTH_SHORT).show();
             signIn();
-            //activityMainBinding.button.setOnClickListener(v-> signIn());
+
         }
     }
 
@@ -284,7 +339,7 @@ public class MainActivity extends AppCompatActivity {
     {
         dialog.cancel();
     }
-    public void dialog_validate()
+    public void dialog_validate(View view)
     {
         if(startdatetemp != null && enddatetemp != null)
         {
@@ -296,5 +351,42 @@ public class MainActivity extends AppCompatActivity {
         {
             Toast.makeText(this, googleAccountCredential.getSelectedAccountName() + " signed in", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public List<event_model> cmeet_from_googleEvent(List<Event> myevent, Context con)
+    {
+
+        List<event_model> LEM = new ArrayList<>();
+        for (Event ev : myevent)
+        {
+            event_model cm = new event_model();
+            cm.setMeetingId(ev.getId());
+            cm.setLocation(ev.getLocation());
+            cm.setNumberOfParticipants(ev.getAttendees()==null?0:ev.getAttendees().size());
+            cm.setOwner(ev.getOrganizer().getEmail()==null?ev.getCreator().getId():ev.getOrganizer().getEmail());
+            cm.setDateofcreation(ev.getCreated().toString());
+            cm.setStartdate(ev.getStart().getDate()==null?"none":ev.getStart().getDate().toString());
+            cm.setEnddate(ev.getEnd().getDate()==null?"none":ev.getEnd().toString());
+            cm.setDescription(ev.getDescription()==null?"none":ev.getDescription());
+            cm.setTitle(ev.getSummary()==null?"none":ev.getSummary());
+            cm.setAttendee(getAttendees(ev.getAttendees()));
+            cm.setuserid(MainActivity.userid==null?user.getUserId():MainActivity.userid);
+            LEM.add(cm);
+        }
+        cmeet_event_list = LEM;
+        return LEM;
+    }
+    public static String[] getAttendees(List<EventAttendee> attendeesList)
+    {
+        ArrayList<String> Attendees = new ArrayList<>();
+        if (attendeesList == null)
+        {
+            return null;
+        }
+        for (EventAttendee attendee : attendeesList)
+        {
+            Attendees.add(attendee.getEmail());
+        }
+        return Attendees.toArray(new String[0]);
     }
 }

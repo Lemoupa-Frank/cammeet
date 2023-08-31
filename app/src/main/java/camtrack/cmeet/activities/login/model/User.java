@@ -5,7 +5,6 @@ public class User {
     private final String display_name;
     private final String number;
     private final String department;
-    private final String password;
 
     /**A constructor to fully initialize user for
      * his session
@@ -13,27 +12,23 @@ public class User {
      * @param display_name - user disply name
      * @param number  - user phone number
      * @param department - user department
-     * @param password -users database password
      */
-    public User(String userId, String display_name, String number, String department, String password) {
+    public User(String userId, String display_name, String number, String department) {
         this.userId = userId;
         this.display_name = display_name;
         this.number = number;
         this.department = department;
-        this.password = password;
     }
 
     /**A constructor used for user which are not logged
      * this helpfull in adding attendees or storing attendess
-     * @param userId user email
-     * @param display_name users display name
      */
-    public User(String userId, String display_name) {
-        this.userId = userId;
-        this.display_name = display_name;
-        department = null;
-        number = null;
-        password = null;
+    public User()
+    {
+        this.userId = null;
+        this.display_name = null;
+        this.number = null;
+        this.department = null;
     }
 
     public String getUserId() {
@@ -52,7 +47,6 @@ public class User {
         return department;
     }
 
-    public String getPassword() {
-        return password;
-    }
+
+
 }

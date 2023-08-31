@@ -34,7 +34,7 @@
     <string name="starting_from"> Select Start Time </string>
     <string name="end_time"> Select End Time </string>
     <string name="validate"> validate </string>
-    <string name="cancel"> cancel </string>
+    <string name="cancel"> Cancel </string>
     <string-array name="Departments">
         <item>Informatique</item>
         <item>Service Après-vente</item>

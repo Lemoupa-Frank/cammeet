@@ -6,62 +6,44 @@
     android:layout_height="match_parent"
     tools:context=".activities.MainActivity">
 
-    <ProgressBar
-        android:id="@+id/circularProgressBar"
-        android:layout_width="70dp"
-        android:layout_height="66dp"
-        android:layout_gravity="center"
-        android:background="@drawable/rounded_square"
-        android:foreground="@drawable/rounded_square"
-        android:foregroundGravity="center"
-        android:indeterminate="false"
-        android:innerRadiusRatio="0.2"
-        android:progressBackgroundTint="@color/black"
-        android:thickness="3dp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/TrustMessage"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.492"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.404" />
-
-    <Button
+    <ImageButton
         android:id="@+id/button"
-        android:layout_width="230dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="93dp"
-        android:text="@string/signin"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="28dp"
+        android:background="@drawable/ic_baseline_calendar_today_24"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/bt2"
         android:layout_width="230dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="164dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="46dp"
         android:text="@string/click"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/MainActivityFrag"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button"
         app:layout_constraintVertical_bias="0.0" />
+
+    <FrameLayout
+        android:id="@+id/MainActivityFrag"
+        android:layout_width="match_parent"
+        android:background="@drawable/upper_rounded_square"
+        android:layout_height="250dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/MainActivityFragrecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            android:clipToPadding="false"
+            android:scrollbars="horizontal"  />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
