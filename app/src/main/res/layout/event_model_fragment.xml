@@ -10,5 +10,5 @@
         android:layout_height="match_parent"
         android:padding="8dp"
         android:clipToPadding="false"
-        android:scrollbars="horizontal" />
+        android:scrollbars="none" />
 </FrameLayout>
