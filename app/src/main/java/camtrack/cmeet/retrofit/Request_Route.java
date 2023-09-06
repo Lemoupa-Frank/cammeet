@@ -6,6 +6,8 @@ import java.util.List;
 
 
 import camtrack.cmeet.activities.Events.event_model;
+import camtrack.cmeet.activities.UserMeetings.UserMeetings;
+import camtrack.cmeet.activities.UserMeetings.UserMeetingsPK;
 import camtrack.cmeet.activities.login.model.User;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -28,6 +30,8 @@ public interface Request_Route
     @GET("store_meet/My_meets")
     Call<List<event_model>> get_meets(@Query("userid") String userid);
 
+    @GET("store_meet/FindUserByMeetings")
+    Call<List<UserMeetings>> get_attendees(@Query("meetingsId") String userid);
 
     @GET("user/login")
     Call<User> login(@Query("userId") String userId, @Query("password") String password);

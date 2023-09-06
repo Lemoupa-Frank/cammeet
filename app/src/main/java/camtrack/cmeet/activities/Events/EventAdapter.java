@@ -1,12 +1,20 @@
 package camtrack.cmeet.activities.Events;
 
 
+import static java.security.AccessController.getContext;
+
+import static camtrack.cmeet.activities.DatePickerFragment.enddate;
+import static camtrack.cmeet.activities.DatePickerFragment.startdate;
+import static camtrack.cmeet.activities.Events.ViewEvent.LUM;
+import static camtrack.cmeet.activities.MainActivity.cmeet_event_list;
+
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,6 +24,11 @@ import com.google.api.services.calendar.model.Event;
 import java.util.List;
 
 import camtrack.cmeet.R;
+import camtrack.cmeet.Request_Maker;
+import camtrack.cmeet.activities.MainActivity;
+import camtrack.cmeet.retrofit.Retrofit_Base_Class;
+import retrofit2.Retrofit;
+
 // Event adapater for google events
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
     private final List<Event> eventList;
@@ -27,8 +40,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     /**
      * event adapter Constructor for google event
-     * @param eventList
-     * @param context
+     * @param eventList List of google events
+     * @param context The context of the calling class
      */
     public EventAdapter( List<Event> eventList, Context context) {
        this.eventList = eventList;
@@ -102,7 +115,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         {
             super(itemView);
             textEventSummary = itemView.findViewById(R.id.textEventSummary);
-            itemView.setOnClickListener(view -> {
+            textEventSummary.setOnClickListener(view -> {
+                Retrofit retroObj = Retrofit_Base_Class.getClient();
+                Request_Maker RM = new Request_Maker();
+                new Thread(() ->
+                {RM.getAttendees(retroObj,cmeet_event_list.get(ClickedItem).getMeetingId());}).start();
                 ClickedItem = getAdapterPosition();
                 Intent I = new Intent(mcontext,ViewEvent.class);
                 mcontext.startActivity(I);

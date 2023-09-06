@@ -18,7 +18,8 @@ import java.util.List;
 import camtrack.cmeet.R;
 import camtrack.cmeet.activities.MainActivity;
 
-public class MainActivityEventFragment extends Fragment {
+public class MainActivityEventFragment extends Fragment
+{
 
     public List<Event> googleEvents = MainActivity.items();
     public List<event_model> cmeet_list = MainActivity.get_cmeet_event_list();

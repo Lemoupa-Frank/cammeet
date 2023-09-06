@@ -1,7 +1,14 @@
 package camtrack.cmeet.activities.Events;
 
 
+
+import static camtrack.cmeet.activities.Events.EventAdapter.ClickedItem;
+import static camtrack.cmeet.activities.Events.ViewEvent.LUM;
+import static camtrack.cmeet.activities.MainActivity.cmeet_event_list;
+import static camtrack.cmeet.activities.MainActivity.getuser;
+
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -10,11 +17,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.HashMap;
 
 import camtrack.cmeet.R;
+import camtrack.cmeet.Request_Maker;
+import camtrack.cmeet.activities.MainActivity;
+import camtrack.cmeet.activities.UserMeetings.UserMeetings;
 
-public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Recycler_Adapter.ViewHolder> {
+public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Recycler_Adapter.ViewHolder>
+{
 
     private final String[] attendeeArray;
     private final Context context;
@@ -53,17 +68,49 @@ public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Rec
         return attendeeArray.length;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView attendeeTextView;
+    public class ViewHolder extends RecyclerView.ViewHolder
+    {
+        TextView attendeeTextView; ImageView imageView;
 
-        public ViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView)
+        {
             super(itemView);
             attendeeTextView = itemView.findViewById(R.id.attendee_email);
-            itemView.setOnClickListener(view -> {
+            imageView = itemView.findViewById(R.id.attendee_image);
+            if(getuser().getUserId().equals(cmeet_event_list.get(ClickedItem).getOwner()))
+            {
+                imageView.setVisibility(View.VISIBLE);
+            }
+            attendeeTextView.setOnClickListener(view -> {
                 SeletectedAttendee = getAdapterPosition();
                 Intent I = new Intent(context,ViewEvent.class);
                 context.startActivity(I);
+                // create a dialog in Attendee recycler and access it with its methods
             });
+            imageView.setOnClickListener(v->
+            {
+                SeletectedAttendee = getAdapterPosition();
+                imageView.setImageResource(R.drawable.circular_progress_indicator);
+                if(LUM != null)
+                {
+                    HashMap<String, UserMeetings> UserMeetingsHashMap = new HashMap<>();
+                    Request_Maker RM = new Request_Maker();
+                    UserMeetingsHashMap = RM.convertAttendeesToHashMap(LUM);
+                    if(UserMeetingsHashMap.containsKey(cmeet_event_list.get(ClickedItem).getAttendee()[SeletectedAttendee]))
+                    {
+                        Toast.makeText(v.getContext(), cmeet_event_list.get(ClickedItem).getAttendee()[SeletectedAttendee] + "is now an owner",Toast.LENGTH_LONG).show();
+                    }
+                    else
+                    {
+                        Toast.makeText(v.getContext(), cmeet_event_list.get(ClickedItem).getAttendee()[SeletectedAttendee] + "Canot be made owner",Toast.LENGTH_LONG).show();
+                    }
+                }
+                else
+                {
+                    Toast.makeText(v.getContext(), "Please Check Your Network",Toast.LENGTH_LONG).show();
+                }
+            });
+
         }
     }
 }

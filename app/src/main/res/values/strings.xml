@@ -35,6 +35,7 @@
     <string name="end_time"> Select End Time </string>
     <string name="validate"> validate </string>
     <string name="cancel"> Cancel </string>
+    <string name="authorise_siging">Athorise Signing</string>
     <string-array name="Departments">
         <item>Informatique</item>
         <item>Service Après-vente</item>

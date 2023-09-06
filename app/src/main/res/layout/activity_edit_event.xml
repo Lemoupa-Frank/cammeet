@@ -24,14 +24,12 @@
             android:contentDescription="@string/clear_image_view"
             android:layout_marginStart="10dp" />
 
-        <ImageButton
-            android:id="@+id/edit"
-            android:layout_width="42dp"
+        <Button
+            android:id="@+id/save"
+            android:layout_width="wrap_content"
             android:layout_height="42dp"
-            android:layout_marginStart="230dp"
-            app:tint="@color/black_white"
-            android:background="@drawable/ic_baseline_edit_24"
-            android:contentDescription="@string/edit_image_view" />
+            android:layout_marginStart="200dp"
+            android:text="enregistré" />
     </LinearLayout>
 
     <ScrollView
@@ -43,7 +41,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Linear"
         android:layout_marginTop="60dp"
->
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -51,15 +49,16 @@
             android:layout_marginTop="6dp"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/Summary"
+            <EditText
+                android:id="@+id/editSummary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:layout_gravity="center"
                 android:textColor="@color/black_white"
                 android:textSize="24sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:ignore="Autofill,LabelFor,TextFields"
+                android:layout_gravity="center"/>
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -67,21 +66,23 @@
                 android:layout_marginTop="13dp"
                 android:orientation="horizontal"
                 tools:ignore="UseCompoundDrawables">
-                 <ImageView
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:contentDescription="@string/location_image_view"
-                     android:background="@drawable/ic_baseline_location_on_24"/>
-                <TextView
-                    android:id="@+id/location"
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/location_image_view"
+                    android:background="@drawable/ic_baseline_location_on_24"/>
+                <EditText
+                    android:id="@+id/editlocation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start|top"
-                    android:textSize="18sp"/>
-        </LinearLayout>
+                    android:textSize="18sp"
+                    tools:ignore="Autofill,LabelFor,TextFields"
+                    />
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/Owner"
+                android:id="@+id/editOwner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
@@ -101,13 +102,13 @@
                     android:contentDescription="@string/location_image_view"
                     android:background="@drawable/ic_baseline_people_24"/>
                 <FrameLayout
-                    android:id="@+id/attendeesfragment"
+                    android:id="@+id/editattendeesfragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent">
 
                     <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/attendeesRecycler"
+                        android:id="@+id/editattendeesRecycler"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:clipToPadding="false"
@@ -126,26 +127,15 @@
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/location_image_view"
                     android:background="@drawable/ic_baseline_description_24"/>
-                <TextView
-                    android:id="@+id/Description"
+                <EditText
+                    android:id="@+id/editDescription"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start|top"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    tools:ignore="Autofill,LabelFor,TextFields" />
             </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
-
-    <Button
-        android:id="@+id/startsigning"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="16dp"
-        android:text="@string/authorise_siging"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/scroll"
-        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

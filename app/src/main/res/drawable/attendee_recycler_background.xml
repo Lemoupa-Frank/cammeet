@@ -6,6 +6,7 @@
 
     <stroke
         android:color="@color/black_white"
+        android:dashGap="3dp"
         android:width="2dp">
     </stroke>
     <corners

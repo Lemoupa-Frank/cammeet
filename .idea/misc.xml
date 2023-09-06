@@ -9,6 +9,7 @@
         <entry key="app/src/main/res/drawable/attendee_recycler_background.xml" value="0.138" />
         <entry key="app/src/main/res/drawable/circular_progress_indicator.xml" value="0.138" />
         <entry key="app/src/main/res/drawable/ic_baseline_admin_panel_settings_24.xml" value="0.151" />
+        <entry key="app/src/main/res/drawable/ic_baseline_assignment_24.xml" value="0.145" />
         <entry key="app/src/main/res/drawable/ic_baseline_attach_file_24.xml" value="0.151" />
         <entry key="app/src/main/res/drawable/ic_baseline_calendar_today_24.xml" value="0.138" />
         <entry key="app/src/main/res/drawable/ic_baseline_clear_24.xml" value="0.1" />
@@ -16,6 +17,7 @@
         <entry key="app/src/main/res/drawable/ic_baseline_edit_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_location_on_24.xml" value="0.151" />
         <entry key="app/src/main/res/drawable/ic_baseline_people_24.xml" value="0.151" />
+        <entry key="app/src/main/res/drawable/ic_baseline_perm_identity_24.xml" value="0.145" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.151" />
         <entry key="app/src/main/res/drawable/ic_outline_location_on_24.xml" value="0.151" />
         <entry key="app/src/main/res/drawable/ic_sharp_location_on_24.xml" value="0.151" />
@@ -25,6 +27,7 @@
         <entry key="app/src/main/res/layout-w1240dp/activity_login2.xml" value="0.1" />
         <entry key="app/src/main/res/layout-w936dp/activity_login.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_edit_activty.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_edit_event.xml" value="0.1765625" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_login2.xml" value="0.8259803921568627" />
         <entry key="app/src/main/res/layout/activity_login_.xml" value="0.1" />

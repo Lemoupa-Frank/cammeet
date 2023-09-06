@@ -35,4 +35,6 @@
     <string name="end_time"> Sélectionnez l\'heure de fin </string>
     <string name="validate"> valider </string>
     <string name="cancel"> Annuler </string>
+    <string name="authorise_siging">Autoriser les signature</string>
+
 </resources>

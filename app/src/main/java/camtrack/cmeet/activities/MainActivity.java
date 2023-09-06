@@ -65,7 +65,7 @@ import retrofit2.Retrofit;
 public class MainActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 9001;
     //Load previous events from cache data or store some default event
-    public static List<event_model> cmeet_event_list = null; public static List<Event> items = null;
+    public static List<event_model> cmeet_event_list; public static List<Event> items = null;
     MutableLiveData<List<Event>> items_listener = new MutableLiveData<>();
    // MutableLiveData<List<event_model>> cmeet_event_list_listener = new MutableLiveData<>();
     Request_Route request_route_instqnce; Retrofit retrofitobj;
@@ -257,14 +257,12 @@ public class MainActivity extends AppCompatActivity {
      * the function sets a progressbar before creating the
      * new thread
      */
-    public void async() {
-        //delaydialog.show();
+    public void async()
+    {
         new Thread(() ->
         {
             items = getEventsForDay(startdate, enddate);
             items_listener.postValue(items);
-
-           // delaydialog.cancel();
             if (items == null)
             {
                 activityMainBinding.getRoot().post(() -> Toast.makeText(MainActivity.this, "Unable to Load events", Toast.LENGTH_LONG).show());
@@ -388,5 +386,10 @@ public class MainActivity extends AppCompatActivity {
             Attendees.add(attendee.getEmail());
         }
         return Attendees.toArray(new String[0]);
+    }
+
+    public static User getuser()
+    {
+        return user;
     }
 }
