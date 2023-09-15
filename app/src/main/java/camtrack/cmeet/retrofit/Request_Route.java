@@ -35,5 +35,8 @@ public interface Request_Route
 
     @GET("user/login")
     Call<User> login(@Query("userId") String userId, @Query("password") String password);
+
+    @POST("store_meet/update_meetings")
+    Call<Void> update_meets(@Body  event_model lem);
 }
 

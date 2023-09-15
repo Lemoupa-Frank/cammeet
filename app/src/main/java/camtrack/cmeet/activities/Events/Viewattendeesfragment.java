@@ -2,14 +2,11 @@ package camtrack.cmeet.activities.Events;
 
 import static camtrack.cmeet.activities.Events.EventAdapter.ClickedItem;
 
-import android.content.Context;
+
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.api.services.calendar.model.Event;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,8 +23,10 @@ import camtrack.cmeet.activities.MainActivity;
 
 public class Viewattendeesfragment extends Fragment
 {
+    ArrayList<String> attendeeList = null;
     public List<Event> googleEvents = camtrack.cmeet.activities.MainActivity.items();
     public List<event_model> cmeet_list = MainActivity.get_cmeet_event_list();
+    Boolean Filled_attendee = true;
     String[] a = {"Deea","qzdazd","adazdz","azdzda","adazdad","adazdadaz","azdazdazdaz","azdazdazdzd","zdadazd"};
     public Viewattendeesfragment() {
         // Required empty public constructor
@@ -45,6 +45,7 @@ public class Viewattendeesfragment extends Fragment
             ViewGroup.LayoutParams layoutParams = recyclerView.getLayoutParams();
             layoutParams.height = maxHeightInPixels;
             recyclerView.setLayoutParams(layoutParams);
+            Filled_attendee = false;
         }
         else if((cmeet_list.get(ClickedItem).getAttendee().length) >= 4)
         {
@@ -53,10 +54,15 @@ public class Viewattendeesfragment extends Fragment
             layoutParams.height = maxHeightInPixels;
             recyclerView.setLayoutParams(layoutParams);
         }
+        if(Filled_attendee)
+        {
+            attendeeList = new ArrayList<>(Arrays.asList(cmeet_list.get(ClickedItem).getAttendee()));
+        }
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
         //Attendee_Recycler_Adapter attendeeRecyclerAdapter = new Attendee_Recycler_Adapter(a,getContext());
-        Attendee_Recycler_Adapter attendeeRecyclerAdapter = new Attendee_Recycler_Adapter((cmeet_list.get(ClickedItem).getAttendee()),getContext());
+        Attendee_Recycler_Adapter attendeeRecyclerAdapter = new Attendee_Recycler_Adapter(attendeeList,getContext());
         recyclerView.setAdapter(attendeeRecyclerAdapter);
         return view;
     }
+
 }

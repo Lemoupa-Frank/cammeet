@@ -9,6 +9,7 @@ import static camtrack.cmeet.activities.MainActivity.getuser;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -21,6 +22,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import camtrack.cmeet.R;
@@ -31,13 +34,13 @@ import camtrack.cmeet.activities.UserMeetings.UserMeetings;
 public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Recycler_Adapter.ViewHolder>
 {
 
-    private final String[] attendeeArray;
+    private final ArrayList<String> attendeeList;
     private final Context context;
     int SeletectedAttendee;
     View itemView;
 
-    public Attendee_Recycler_Adapter(String[] attendeeArray, Context context) {
-        this.attendeeArray = attendeeArray;
+    public Attendee_Recycler_Adapter(ArrayList<String> attendeeList, Context context) {
+        this.attendeeList = attendeeList;
         this.context = context;
     }
 
@@ -51,7 +54,7 @@ public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Rec
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String attendee_email = attendeeArray[position];
+        String attendee_email = attendeeList.get(position);
         if (attendee_email == null)
         {
             holder.attendeeTextView.setText("attendee_email");
@@ -61,56 +64,87 @@ public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Rec
 
     @Override
     public int getItemCount() {
-        if (attendeeArray==null)
+        if (attendeeList==null)
         {
             return 0;
         }
-        return attendeeArray.length;
+        return attendeeList.size();
+    }
+
+    public void removeItem(int position)
+    {
+        attendeeList.remove(position);
+        notifyItemRemoved(position);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder
     {
-        TextView attendeeTextView; ImageView imageView;
-
+        TextView attendeeTextView; ImageView makeowner, removeattendee;
         public ViewHolder(@NonNull View itemView)
         {
             super(itemView);
             attendeeTextView = itemView.findViewById(R.id.attendee_email);
-            imageView = itemView.findViewById(R.id.attendee_image);
+            makeowner = itemView.findViewById(R.id.attendee_image);
+            removeattendee = itemView.findViewById(R.id.Delete_attendee);
             if(getuser().getUserId().equals(cmeet_event_list.get(ClickedItem).getOwner()))
             {
-                imageView.setVisibility(View.VISIBLE);
+                makeowner.setVisibility(View.VISIBLE);
+                removeattendee.setVisibility(View.VISIBLE);
             }
             attendeeTextView.setOnClickListener(view -> {
                 SeletectedAttendee = getAdapterPosition();
-                Intent I = new Intent(context,ViewEvent.class);
-                context.startActivity(I);
                 // create a dialog in Attendee recycler and access it with its methods
             });
-            imageView.setOnClickListener(v->
+
             {
-                SeletectedAttendee = getAdapterPosition();
-                imageView.setImageResource(R.drawable.circular_progress_indicator);
-                if(LUM != null)
+                makeowner.setOnClickListener(v ->
                 {
-                    HashMap<String, UserMeetings> UserMeetingsHashMap = new HashMap<>();
-                    Request_Maker RM = new Request_Maker();
-                    UserMeetingsHashMap = RM.convertAttendeesToHashMap(LUM);
-                    if(UserMeetingsHashMap.containsKey(cmeet_event_list.get(ClickedItem).getAttendee()[SeletectedAttendee]))
+                    SeletectedAttendee = getAdapterPosition();
+
+                    if (LUM != null)
                     {
-                        Toast.makeText(v.getContext(), cmeet_event_list.get(ClickedItem).getAttendee()[SeletectedAttendee] + "is now an owner",Toast.LENGTH_LONG).show();
+                        HashMap<String, UserMeetings> UserMeetingsHashMap = new HashMap<>();
+                        Request_Maker RM = new Request_Maker();
+                        UserMeetingsHashMap = RM.convertAttendeesToHashMap(LUM);
+                        if (UserMeetingsHashMap.containsKey(cmeet_event_list.get(ClickedItem).getAttendee()[SeletectedAttendee])) {
+                            makeowner.setImageResource(R.drawable.circular_progress_indicator);
+                            Toast.makeText(v.getContext(), cmeet_event_list.get(ClickedItem).getAttendee()[SeletectedAttendee] + "is now an owner", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(v.getContext(), cmeet_event_list.get(ClickedItem).getAttendee()[SeletectedAttendee] + "Canot be made owner", Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Toast.makeText(v.getContext(), "Please Check Your Network", Toast.LENGTH_LONG).show();
                     }
-                    else
-                    {
-                        Toast.makeText(v.getContext(), cmeet_event_list.get(ClickedItem).getAttendee()[SeletectedAttendee] + "Canot be made owner",Toast.LENGTH_LONG).show();
-                    }
-                }
-                else
-                {
-                    Toast.makeText(v.getContext(), "Please Check Your Network",Toast.LENGTH_LONG).show();
+                });
+            }
+            removeattendee.setOnClickListener(v->
+            {
+
+                removeItem(getAdapterPosition());
+                EditEvent.Selected_Event_attendeeList =  attendeeList;
+            });
+
+            attendeeTextView.setOnLongClickListener(new View.OnLongClickListener()
+            {
+                @Override
+                public boolean onLongClick(View view) {
+                    return false;
                 }
             });
 
         }
     }
 }
+
+/*
+ Thread attendeeThread = new Thread(() -> {
+    try {
+        getAttendees.execute();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}, "AttendeeThread");
+
+attendeeThread.start();*/
+
+// convert attendeesArray to an arralist2

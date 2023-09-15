@@ -13,6 +13,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.java_websocket.drafts.Draft;
+import org.java_websocket.drafts.Draft_6455;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import camtrack.cmeet.R;
 import camtrack.cmeet.activities.MainActivity;
 import camtrack.cmeet.activities.cmeet_delay;
@@ -21,6 +27,7 @@ import camtrack.cmeet.activities.login.model.User;
 import camtrack.cmeet.databinding.ActivityLoginBinding;
 import camtrack.cmeet.retrofit.Request_Route;
 import camtrack.cmeet.retrofit.Retrofit_Base_Class;
+import camtrack.cmeet.websocket.webSocketClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -58,8 +65,6 @@ public class login extends AppCompatActivity {
             {
                 Toast.makeText(login.this, R.string.EnterFiled, Toast.LENGTH_LONG).show();
             }
-
-
         });
     }
     public void LOG(Retrofit rbc)

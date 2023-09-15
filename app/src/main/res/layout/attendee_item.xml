@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:padding="10dp"
+    android:paddingStart="1dp"
+    android:paddingEnd="0dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
     xmlns:android="http://schemas.android.com/apk/res/android">
         <TextView
             android:id="@+id/attendee_email"
@@ -23,5 +25,17 @@
         android:layout_toEndOf="@+id/attendee_email"
         android:background="@drawable/ic_baseline_perm_identity_24"
         android:contentDescription="@string/location_image_view"
-        android:visibility="invisible"/>
+        android:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/Delete_attendee"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="4dp"
+        android:layout_toEndOf="@+id/attendee_image"
+        android:background="@drawable/ic_baseline_indeterminate_check_box_24"
+        android:contentDescription="@string/location_image_view"
+        android:visibility="invisible" />
 </RelativeLayout>

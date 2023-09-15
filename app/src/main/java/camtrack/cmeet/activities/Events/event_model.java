@@ -24,6 +24,7 @@ public class event_model  implements Serializable{
     private String userid;
 
     private String[] attendee;
+    //MOve this datatype to an ArrayList maybe
 
 
     public String getMeetingId() {

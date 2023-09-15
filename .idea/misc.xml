@@ -15,6 +15,7 @@
         <entry key="app/src/main/res/drawable/ic_baseline_clear_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_description_24.xml" value="0.151" />
         <entry key="app/src/main/res/drawable/ic_baseline_edit_24.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_baseline_indeterminate_check_box_24.xml" value="0.151" />
         <entry key="app/src/main/res/drawable/ic_baseline_location_on_24.xml" value="0.151" />
         <entry key="app/src/main/res/drawable/ic_baseline_people_24.xml" value="0.151" />
         <entry key="app/src/main/res/drawable/ic_baseline_perm_identity_24.xml" value="0.145" />
@@ -33,6 +34,7 @@
         <entry key="app/src/main/res/layout/activity_login_.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_view_event.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_web_soc.xml" value="0.1765625" />
         <entry key="app/src/main/res/layout/attendee_item.xml" value="0.17552083333333332" />
         <entry key="app/src/main/res/layout/circularprogressbar.xml" value="0.1765625" />
         <entry key="app/src/main/res/layout/create_account.xml" value="0.1" />

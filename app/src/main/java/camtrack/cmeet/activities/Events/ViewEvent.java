@@ -3,6 +3,7 @@ package camtrack.cmeet.activities.Events;
 import static camtrack.cmeet.activities.Events.EventAdapter.ClickedItem;
 
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -14,8 +15,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import camtrack.cmeet.R;
@@ -24,6 +29,8 @@ import camtrack.cmeet.activities.UserMeetings.UserMeetings;
 import camtrack.cmeet.activities.login.model.User;
 import camtrack.cmeet.databinding.ActivityViewEventBinding;
 import camtrack.cmeet.retrofit.Retrofit_Base_Class;
+import camtrack.cmeet.websocket.Message;
+import camtrack.cmeet.websocket.webSocketClient;
 import retrofit2.Retrofit;
 // if the textviews are wrap content then if i set the picture and text only at runtime them i might achieve vanishing effect
 // Any conversion to String must be checked for nul  pointers
@@ -34,8 +41,12 @@ public class ViewEvent extends AppCompatActivity {
     public List<Event> a = MainActivity.items();
     static public List<UserMeetings> LUM;
     public List<event_model> event_List = MainActivity.get_cmeet_event_list();
+    private webSocketClient WebSocketClients;
+    boolean Signable;
+    Message startSign;
     Event event ;
     event_model eventmodel;
+    URI serverUri = null;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -44,6 +55,19 @@ public class ViewEvent extends AppCompatActivity {
         Selected_Event = ClickedItem;
         viewEventBinding = ActivityViewEventBinding.inflate(getLayoutInflater());
         this.eventmodel = event_List.get(Selected_Event);
+        if(check_owner(user.getUserId(),a.get(Selected_Event).getOrganizer().getEmail())) {viewEventBinding.edit.setVisibility(View.VISIBLE);}
+        try
+        {
+            serverUri = new URI("ws://192.168.43.108:8080");
+        } catch (URISyntaxException e)
+        {
+            e.printStackTrace();
+        }
+        final webSocketClient wb = new webSocketClient(serverUri);
+        wb.connect();
+        WebSocketClients = wb;
+
+
         viewEventBinding.startsigning.setVisibility(eventmodel.getOwner().equals(user.getUserId())?View.VISIBLE:View.INVISIBLE);
         {
             Viewattendeesfragment fragment = new Viewattendeesfragment();
@@ -52,37 +76,73 @@ public class ViewEvent extends AppCompatActivity {
                     .replace(R.id.attendeesfragment, fragment)
                     .commit();
         }
-        viewEventBinding.startsigning.setOnClickListener(v->
-        {
-            Toast.makeText(ViewEvent.this,"I the Owner",Toast.LENGTH_LONG).show();
-        });
-        setContentView(viewEventBinding.getRoot());
+
+
 
         viewEventBinding.Summary.setText(event_List.get(Selected_Event).getTitle()==null?" ":event_List.get(Selected_Event).getTitle());
         viewEventBinding.location.setText(event_List.get(Selected_Event).getLocation()==null?" ":event_List.get(Selected_Event).getLocation());
         viewEventBinding.Owner.setText(event_List.get(Selected_Event).getOwner()==null?" ":event_List.get(Selected_Event).getOwner());
         viewEventBinding.Description.setText(event_List.get(Selected_Event).getDescription()==null?" ":event_List.get(Selected_Event).getDescription());
 
-
+        viewEventBinding.startsigning.setOnClickListener(v->
+        {
+            //think about connect in this very button and add delay to obtain server return
+            if(wb.isOpen())
+            {
+                startSign = new Message();
+                startSign.setMeetingId(event_List.get(Selected_Event).getMeetingId());
+                startSign.setSignable(true);
+                startSign.setSender(user.getUserId());
+                wb.send(startSign.toJson());
+            }
+            else
+            {
+                recreate();
+                Toast.makeText(ViewEvent.this,"An error occured please try again",Toast.LENGTH_LONG).show();
+            }
+        });
         viewEventBinding.edit.setOnClickListener(v->
         {
             retrofitobj = Retrofit_Base_Class.getClient();
-          if(check_owner(user.getUserId(),a.get(Selected_Event).getOrganizer().getEmail()))
-          {
+
               Intent a = new Intent(ViewEvent.this,EditEvent.class);
               startActivity(a);
-          }
-          else
-          {
-              Toast.makeText(this, R.string.refuse_event_write_permission, Toast.LENGTH_LONG).show();
-          }
 
         });
-        viewEventBinding.clear.setOnClickListener(v->
+        viewEventBinding.sign.setOnClickListener(v->
         {
-            finish();
+            Toast.makeText(this,"You have Signed theh event",Toast.LENGTH_LONG).show();
         });
+        wb._Message.observe(this,v->
+        {
+
+            JsonObject json = JsonParser.parseString(wb._Message.getValue()).getAsJsonObject();
+            if(json.size() != 0)
+            {
+                String Sender = json.get("sender").getAsString();
+                Signable = json.get("Signable").getAsBoolean();
+                if(Signable)
+                {
+                    viewEventBinding.sign.setVisibility(View.VISIBLE);
+                }
+                Toast.makeText(this,"You can Sign Permitted by:" + Sender,Toast.LENGTH_LONG).show();
+            }
+            // think about making signable false when meeting ends
+        });
+        setContentView(viewEventBinding.getRoot());
+
     }
+
+    @Override
+    protected void onDestroy()
+    {
+        if(WebSocketClients.isOpen())
+        {
+            WebSocketClients.close();
+        }
+        super.onDestroy();
+    }
+
 
     /**Check if the Owner possesses a write permission on the event
      *
@@ -109,18 +169,20 @@ public class ViewEvent extends AppCompatActivity {
     /**
      * For now it doesnt serve much as setting an Edittext invisible
      * does not close the space it occupied
-     * @param ed Edittext to be checked if filled
-     * @param S string to be set to Editext
-     * @param B boolean to see if the edittext has content
+     * @param edittext Edittext to be checked if filled
+     * @param String string to be set to Editext
+     * @param Boolean boolean to see if the edittext has content
      */
-    public void Set_Invisible_on_Empty(TextView ed, String S, Boolean B)
+    public void Set_Invisible_on_Empty(TextView edittext, String String, Boolean Boolean)
     {
-        if(B)
+        if(Boolean)
         {
-            ed.setText(S);
+            edittext.setText(String);
         }
         {
-            ed.setVisibility(View.INVISIBLE);
+            edittext.setVisibility(View.INVISIBLE);
         }
     }
+
+
 }

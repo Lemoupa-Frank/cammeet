@@ -15,23 +15,25 @@
         app:layout_constraintBottom_toTopOf="@+id/scroll"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageButton
-            android:id="@+id/clear"
-            android:layout_width="42dp"
-            app:tint="@color/black_white"
-            android:layout_height="42dp"
-            android:background="@drawable/ic_baseline_clear_24"
+        <Button
+            android:id="@+id/sign"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:contentDescription="@string/clear_image_view"
-            android:layout_marginStart="10dp" />
+            android:text="@string/sign"
+            android:visibility="invisible"
+            app:tint="@color/black_white" />
 
         <ImageButton
             android:id="@+id/edit"
             android:layout_width="42dp"
             android:layout_height="42dp"
-            android:layout_marginStart="230dp"
-            app:tint="@color/black_white"
+            android:layout_marginStart="180dp"
             android:background="@drawable/ic_baseline_edit_24"
-            android:contentDescription="@string/edit_image_view" />
+            android:contentDescription="@string/edit_image_view"
+            android:visibility="invisible"
+            app:tint="@color/black_white" />
     </LinearLayout>
 
     <ScrollView

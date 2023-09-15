@@ -1,5 +1,6 @@
 package camtrack.cmeet;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.provider.Settings;
 import android.widget.Toast;
@@ -71,7 +72,38 @@ public class Request_Maker
             e.printStackTrace();
         }
     }
+    public void update_meetings(Retrofit retrofitObject, event_model cm, Dialog delaydialog, Context con)
+    {
+        Request_Route RR = retrofitObject.create(Request_Route.class);
+        Call<Void> Update_Meetings_Call = RR.update_meets(cm);
+        delaydialog.show();
+        Update_Meetings_Call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                delaydialog.cancel();
+                if(response.isSuccessful())
+                {
+                    Toast.makeText(con,"Success",Toast.LENGTH_LONG).show();
+                }
+                else
+                {
+                    Toast.makeText(con,"Something Went wrong",Toast.LENGTH_LONG).show();
+                }
+            }
 
+            @Override
+            public void onFailure(@NonNull Call<Void> call, Throwable t) {
+                delaydialog.cancel();
+                Toast.makeText(con,"Check Your Connection",Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    /**
+     * Converts list of Attendees into a haspMap to allow better manipulation
+     * @param ListofUserMeetings The list of Attendees for a particular Meeting
+     * @return Returns a hashmap of Attendees
+     */
     public HashMap<String, UserMeetings> convertAttendeesToHashMap(List<UserMeetings> ListofUserMeetings) {
         HashMap<String, UserMeetings> UserMeetingsHashMap = new HashMap<>();
 
@@ -83,3 +115,14 @@ public class Request_Maker
     }
 }
 //http://zqktlwiuavvvqqt4ybvgvi7tyo4hjl5xgfuvpdf6otjiycgwqbym2qad.onion/wiki/The_Matrix
+/*
+            new Thread(()->
+            {
+                try {
+                    getAttendees.execute();
+                } catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }).start();
+ */
