@@ -3,7 +3,7 @@ package camtrack.cmeet.activities.Events;
 import static camtrack.cmeet.activities.Events.EventAdapter.ClickedItem;
 
 
-
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -69,13 +69,14 @@ public class ViewEvent extends AppCompatActivity {
 
 
         viewEventBinding.startsigning.setVisibility(eventmodel.getOwner().equals(user.getUserId())?View.VISIBLE:View.INVISIBLE);
-        {
+
+
             Viewattendeesfragment fragment = new Viewattendeesfragment();
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.attendeesfragment, fragment)
                     .commit();
-        }
+
 
 
 
@@ -112,6 +113,12 @@ public class ViewEvent extends AppCompatActivity {
         viewEventBinding.sign.setOnClickListener(v->
         {
             Toast.makeText(this,"You have Signed theh event",Toast.LENGTH_LONG).show();
+            Toast.makeText(this, fragment.getAttendeeList().toString(), Toast.LENGTH_SHORT).show();
+            startSign = new Message();
+            startSign.setMeetingId(event_List.get(Selected_Event).getMeetingId());
+            startSign.setSender(user.getUserId());
+            if(wb.isOpen())
+            { wb.send(startSign.toJson());}
         });
         wb._Message.observe(this,v->
         {
@@ -120,10 +127,20 @@ public class ViewEvent extends AppCompatActivity {
             if(json.size() != 0)
             {
                 String Sender = json.get("sender").getAsString();
-                Signable = json.get("Signable").getAsBoolean();
+                if(Sender.equals(event_List.get(Selected_Event).getOwner()))
+                {
+                    Signable = json.get("Signable").getAsBoolean();
+                }
                 if(Signable)
                 {
                     viewEventBinding.sign.setVisibility(View.VISIBLE);
+                }
+                if(!Signable)
+                {
+                    viewEventBinding.sign.setVisibility(View.INVISIBLE);
+                }
+                {
+                    fragment.update_signature(fragment.getAttendeePosition(Sender));
                 }
                 Toast.makeText(this,"You can Sign Permitted by:" + Sender,Toast.LENGTH_LONG).show();
             }
@@ -186,3 +203,6 @@ public class ViewEvent extends AppCompatActivity {
 
 
 }
+// If a user enters after the message has been broadcasted he would not be able to sign
+// so what you can do it to store the owners sign message and perhaps for every new connection
+// broadcast the owners sign message, or use the other signing to make signablee

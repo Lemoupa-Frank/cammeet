@@ -13,6 +13,10 @@ import android.util.Log;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
@@ -25,6 +29,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import camtrack.cmeet.R;
 import camtrack.cmeet.Request_Maker;
@@ -34,14 +39,16 @@ import camtrack.cmeet.activities.UserMeetings.UserMeetings;
 public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Recycler_Adapter.ViewHolder>
 {
 
-    private final ArrayList<String> attendeeList;
+    public ArrayList<String> attendeeList;
     private final Context context;
+    LifecycleOwner lifecycleOwner;
     int SeletectedAttendee;
     View itemView;
 
-    public Attendee_Recycler_Adapter(ArrayList<String> attendeeList, Context context) {
+    public Attendee_Recycler_Adapter(ArrayList<String> attendeeList, Context context,LifecycleOwner lifecycleOwner) {
         this.attendeeList = attendeeList;
         this.context = context;
+        this.lifecycleOwner = lifecycleOwner;
     }
 
     @NonNull
@@ -62,6 +69,7 @@ public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Rec
         holder.attendeeTextView.setText(attendee_email);
     }
 
+
     @Override
     public int getItemCount() {
         if (attendeeList==null)
@@ -79,6 +87,7 @@ public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Rec
 
     public class ViewHolder extends RecyclerView.ViewHolder
     {
+        HashMap<String, UserMeetings> UserMeetingsHashMap;
         TextView attendeeTextView; ImageView makeowner, removeattendee;
         public ViewHolder(@NonNull View itemView)
         {
@@ -86,6 +95,13 @@ public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Rec
             attendeeTextView = itemView.findViewById(R.id.attendee_email);
             makeowner = itemView.findViewById(R.id.attendee_image);
             removeattendee = itemView.findViewById(R.id.Delete_attendee);
+
+            if (LUM != null)
+            {
+                Request_Maker RM = new Request_Maker();
+                UserMeetingsHashMap = RM.convertAttendeesToHashMap(LUM);
+            }
+
             if(getuser().getUserId().equals(cmeet_event_list.get(ClickedItem).getOwner()))
             {
                 makeowner.setVisibility(View.VISIBLE);
@@ -103,17 +119,19 @@ public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Rec
 
                     if (LUM != null)
                     {
-                        HashMap<String, UserMeetings> UserMeetingsHashMap = new HashMap<>();
-                        Request_Maker RM = new Request_Maker();
-                        UserMeetingsHashMap = RM.convertAttendeesToHashMap(LUM);
-                        if (UserMeetingsHashMap.containsKey(cmeet_event_list.get(ClickedItem).getAttendee()[SeletectedAttendee])) {
+                        if (UserMeetingsHashMap.containsKey(cmeet_event_list.get(ClickedItem).getAttendee()[SeletectedAttendee]))
+                        {
                             makeowner.setImageResource(R.drawable.circular_progress_indicator);
                             Toast.makeText(v.getContext(), cmeet_event_list.get(ClickedItem).getAttendee()[SeletectedAttendee] + "is now an owner", Toast.LENGTH_LONG).show();
-                        } else {
+                        } else
+                        {
                             Toast.makeText(v.getContext(), cmeet_event_list.get(ClickedItem).getAttendee()[SeletectedAttendee] + "Canot be made owner", Toast.LENGTH_LONG).show();
                         }
                     } else {
                         Toast.makeText(v.getContext(), "Please Check Your Network", Toast.LENGTH_LONG).show();
+                        //replacing the image placed
+                        //makeowner.setBackground(null);
+                        //makeowner.setImageResource(R.drawable.circular_progress_indicator);
                     }
                 });
             }
@@ -131,6 +149,7 @@ public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Rec
                     return false;
                 }
             });
+
 
         }
     }

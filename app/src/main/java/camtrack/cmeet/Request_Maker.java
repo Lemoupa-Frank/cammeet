@@ -101,6 +101,7 @@ public class Request_Maker
 
     /**
      * Converts list of Attendees into a haspMap to allow better manipulation
+     * of attendees including checking if there exist
      * @param ListofUserMeetings The list of Attendees for a particular Meeting
      * @return Returns a hashmap of Attendees
      */

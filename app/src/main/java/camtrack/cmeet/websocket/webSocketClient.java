@@ -10,7 +10,7 @@ import java.util.TimerTask;
 
 public class webSocketClient extends WebSocketClient {
     public static MutableLiveData<String>  Error =  new MutableLiveData<>();
-    public  MutableLiveData<String>  _Message =  new MutableLiveData<>();;
+    public  MutableLiveData<String>  _Message =  new MutableLiveData<>();
 
     public webSocketClient(URI serverUri) {
         super(serverUri);

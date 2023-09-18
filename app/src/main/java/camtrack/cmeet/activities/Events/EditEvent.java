@@ -32,19 +32,19 @@ public class EditEvent extends AppCompatActivity
         activityEditEventBinding.editDescription.setText(MainActivity.get_cmeet_event_list().get(ClickedItem).getDescription());
         activityEditEventBinding.editlocation.setText(MainActivity.get_cmeet_event_list().get(ClickedItem).getLocation());
         activityEditEventBinding.editSummary.setText(MainActivity.get_cmeet_event_list().get(ClickedItem).getTitle());
-        {
+
             Viewattendeesfragment fragment = new Viewattendeesfragment();
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.editattendeesfragment, fragment)
                     .commit();
-        }
+
         activityEditEventBinding.save.setOnClickListener(v->
         {
             MainActivity.cmeet_event_list.get(ClickedItem).setTitle(activityEditEventBinding.editSummary.getText().toString());
             MainActivity.cmeet_event_list.get(ClickedItem).setLocation(activityEditEventBinding.editlocation.getText().toString());
             MainActivity.cmeet_event_list.get(ClickedItem).setDescription(activityEditEventBinding.editDescription.getText().toString());
-            MainActivity.cmeet_event_list.get(ClickedItem).setAttendee(Selected_Event_attendeeList.toArray(new String[0]));
+            MainActivity.cmeet_event_list.get(ClickedItem).setAttendee(fragment.getAttendeeList().toArray(new String[0]));
             Retrofit R = Retrofit_Base_Class.getClient();
             Request_Maker RM = new Request_Maker();
             Dialog delaydialog = cmeet_delay.delaydialogCircular(this);

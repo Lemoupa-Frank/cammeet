@@ -22,7 +22,7 @@
             android:layout_marginStart="10dp"
             android:contentDescription="@string/clear_image_view"
             android:text="@string/sign"
-            android:visibility="invisible"
+            android:visibility="visible"
             app:tint="@color/black_white" />
 
         <ImageButton
