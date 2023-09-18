@@ -5,20 +5,16 @@ import static camtrack.cmeet.activities.Events.EventAdapter.ClickedItem;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -26,7 +22,9 @@ import java.util.List;
 import camtrack.cmeet.R;
 import camtrack.cmeet.activities.MainActivity;
 import camtrack.cmeet.activities.UserMeetings.UserMeetings;
+import camtrack.cmeet.activities._Dialog;
 import camtrack.cmeet.activities.login.model.User;
+import camtrack.cmeet.customview.SignatureView;
 import camtrack.cmeet.databinding.ActivityViewEventBinding;
 import camtrack.cmeet.retrofit.Retrofit_Base_Class;
 import camtrack.cmeet.websocket.Message;
@@ -36,6 +34,8 @@ import retrofit2.Retrofit;
 // Any conversion to String must be checked for nul  pointers
 
 public class ViewEvent extends AppCompatActivity {
+    private static final String PREF_NAME = "MyAppPrefs";
+    private static final String FILE_NAME = "output.pdf";
     ActivityViewEventBinding viewEventBinding;
     int Selected_Event; Retrofit retrofitobj;
     public List<Event> a = MainActivity.items();
@@ -58,7 +58,7 @@ public class ViewEvent extends AppCompatActivity {
         if(check_owner(user.getUserId(),a.get(Selected_Event).getOrganizer().getEmail())) {viewEventBinding.edit.setVisibility(View.VISIBLE);}
         try
         {
-            serverUri = new URI("ws://192.168.43.108:8080");
+            serverUri = new URI("ws://192.168.43.108:8085");
         } catch (URISyntaxException e)
         {
             e.printStackTrace();
@@ -94,6 +94,7 @@ public class ViewEvent extends AppCompatActivity {
                 startSign.setMeetingId(event_List.get(Selected_Event).getMeetingId());
                 startSign.setSignable(true);
                 startSign.setSender(user.getUserId());
+                viewEventBinding.edit.setVisibility(View.GONE);
                 wb.send(startSign.toJson());
             }
             else
@@ -112,8 +113,17 @@ public class ViewEvent extends AppCompatActivity {
         });
         viewEventBinding.sign.setOnClickListener(v->
         {
-            Toast.makeText(this,"You have Signed theh event",Toast.LENGTH_LONG).show();
-            Toast.makeText(this, fragment.getAttendeeList().toString(), Toast.LENGTH_SHORT).show();
+            Dialog signature_dial = _Dialog.BottomSignature(ViewEvent.this);
+            signature_dial.show();
+            SignatureView ss = signature_dial.findViewById(R.id.signatureView);
+
+            signature_dial.findViewById(R.id.sign_event).setOnClickListener(view -> {
+                Bitmap BitSignature = ss.getSignatureBitmap();
+            });
+            signature_dial.findViewById(R.id.restartsignature).setOnClickListener(view ->
+            {
+                ss.clearSignature();
+            });
             startSign = new Message();
             startSign.setMeetingId(event_List.get(Selected_Event).getMeetingId());
             startSign.setSender(user.getUserId());
@@ -200,9 +210,5 @@ public class ViewEvent extends AppCompatActivity {
             edittext.setVisibility(View.INVISIBLE);
         }
     }
-
-
 }
-// If a user enters after the message has been broadcasted he would not be able to sign
-// so what you can do it to store the owners sign message and perhaps for every new connection
-// broadcast the owners sign message, or use the other signing to make signablee
+//remember to setVisibility of sign to Invisible
