@@ -30,13 +30,21 @@ public interface Request_Route
     @GET("store_meet/My_meets")
     Call<List<event_model>> get_meets(@Query("userid") String userid);
 
-    @GET("store_meet/FindUserByMeetings")
-    Call<List<UserMeetings>> get_attendees(@Query("meetingsId") String userid);
+    @GET("store_meet/finduserbyMeets")
+    Call<List<UserMeetings>> get_attendees(@Query("meetingsId") String meetsId);
 
     @GET("user/login")
     Call<User> login(@Query("userId") String userId, @Query("password") String password);
 
-    @POST("store_meet/update_meetings")
-    Call<Void> update_meets(@Body  event_model lem);
+    @POST("store_meet/meetings")
+    Call<Void> meets(@Body  event_model lem);
+
+    @POST("store_meet/user_meetings")
+    Call<Void> user_meets(@Body UserMeetings UM);
+
+    @GET("user/MyMeeting")
+    Call<UserMeetings> MyMeeting(@Body UserMeetingsPK UPK);
+
+
 }
 

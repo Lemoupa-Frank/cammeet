@@ -118,9 +118,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             textEventSummary.setOnClickListener(view -> {
                 Retrofit retroObj = Retrofit_Base_Class.getClient();
                 Request_Maker RM = new Request_Maker();
-                new Thread(() ->
-                {RM.getAttendees(retroObj,cmeet_event_list.get(ClickedItem).getMeetingId());}).start();
                 ClickedItem = getAdapterPosition();
+                new Thread(() ->
+                {RM.getAttendees(retroObj,cmeet_event_list.get(ClickedItem).getMeetingId(),itemView.getContext());}).start();
                 Intent I = new Intent(mcontext,ViewEvent.class);
                 mcontext.startActivity(I);
             });

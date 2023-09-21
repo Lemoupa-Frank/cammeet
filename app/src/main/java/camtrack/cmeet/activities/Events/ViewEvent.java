@@ -6,23 +6,31 @@ import static camtrack.cmeet.activities.Events.EventAdapter.ClickedItem;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.MutableLiveData;
+import java.io.ByteArrayOutputStream;
+
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.List;
 
 import camtrack.cmeet.R;
+import camtrack.cmeet.Request_Maker;
 import camtrack.cmeet.activities.MainActivity;
 import camtrack.cmeet.activities.UserMeetings.UserMeetings;
+import camtrack.cmeet.activities.UserMeetings.UserMeetingsPK;
 import camtrack.cmeet.activities._Dialog;
+import camtrack.cmeet.activities.cmeet_delay;
 import camtrack.cmeet.activities.login.model.User;
 import camtrack.cmeet.customview.SignatureView;
 import camtrack.cmeet.databinding.ActivityViewEventBinding;
@@ -34,22 +42,28 @@ import retrofit2.Retrofit;
 // Any conversion to String must be checked for nul  pointers
 
 public class ViewEvent extends AppCompatActivity {
-    private static final String PREF_NAME = "MyAppPrefs";
-    private static final String FILE_NAME = "output.pdf";
     ActivityViewEventBinding viewEventBinding;
     int Selected_Event; Retrofit retrofitobj;
     public List<Event> a = MainActivity.items();
-    static public List<UserMeetings> LUM;
+    static public MutableLiveData<List<UserMeetings>> MutableLUM = new MutableLiveData<>();
+    static public List<UserMeetings> LUM; // A network call is done once an event is selected to modify LUM
+    // Make LUM mutable, so you can Create viewevent fragment and if LUM loads and is non null recreate it
     public List<event_model> event_List = MainActivity.get_cmeet_event_list();
     private webSocketClient WebSocketClients;
     boolean Signable;
     Message startSign;
     Event event ;
+    UserMeetings Present_Attendee;
     event_model eventmodel;
     URI serverUri = null;
+    boolean event_owner = false;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        //Start  a process to get user's Meeting, this is what you will use to set
+        //Owners in the Attendee Recycler fragment will be determin by this
+        // You can put a mutable boolean to create fragment once you
+        // get a network reply
         User user = MainActivity.getuser();
         super.onCreate(savedInstanceState);
         Selected_Event = ClickedItem;
@@ -111,24 +125,38 @@ public class ViewEvent extends AppCompatActivity {
               startActivity(a);
 
         });
+
         viewEventBinding.sign.setOnClickListener(v->
         {
+            startSign = new Message();
+            startSign.setMeetingId(event_List.get(Selected_Event).getMeetingId());
+            startSign.setSender(user.getUserId());
+
+
             Dialog signature_dial = _Dialog.BottomSignature(ViewEvent.this);
             signature_dial.show();
             SignatureView ss = signature_dial.findViewById(R.id.signatureView);
-
             signature_dial.findViewById(R.id.sign_event).setOnClickListener(view -> {
                 Bitmap BitSignature = ss.getSignatureBitmap();
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                BitSignature.compress(Bitmap.CompressFormat.JPEG, 100, stream); // Adjust the quality value as needed
+                byte[] byteArray = stream.toByteArray();
+                UserMeetings userInmeet = new UserMeetings();
+                UserMeetingsPK UMPK = new UserMeetingsPK();
+                System.out.println(Arrays.toString(byteArray));
+                UMPK.setMeetingId(event_List.get(Selected_Event).getMeetingId());
+                UMPK.setUserId(user.getUserId());
+                userInmeet.setUserMeetingsPK(UMPK);
+                userInmeet.setSignature(byteArray);
+                Retrofit retrofit = Retrofit_Base_Class.getClient();
+                Request_Maker request_maker = new Request_Maker();
+                Dialog cdelay =  cmeet_delay.delaydialogCircular(ViewEvent.this);
+                request_maker.update_usermeets(retrofit,userInmeet,cdelay,ViewEvent.this,wb,startSign,signature_dial);
             });
             signature_dial.findViewById(R.id.restartsignature).setOnClickListener(view ->
             {
                 ss.clearSignature();
             });
-            startSign = new Message();
-            startSign.setMeetingId(event_List.get(Selected_Event).getMeetingId());
-            startSign.setSender(user.getUserId());
-            if(wb.isOpen())
-            { wb.send(startSign.toJson());}
         });
         wb._Message.observe(this,v->
         {
@@ -139,18 +167,18 @@ public class ViewEvent extends AppCompatActivity {
                 String Sender = json.get("sender").getAsString();
                 if(Sender.equals(event_List.get(Selected_Event).getOwner()))
                 {
-                    Signable = json.get("Signable").getAsBoolean();
+                    if(json.get("Signable") != null)
+                    {
+                        Signable = json.get("Signable").getAsBoolean();
+                    }
                 }
                 if(Signable)
                 {
                     viewEventBinding.sign.setVisibility(View.VISIBLE);
                 }
-                if(!Signable)
-                {
-                    viewEventBinding.sign.setVisibility(View.INVISIBLE);
-                }
-                {
+                if(event_List.get(Selected_Event).getAttendee() != null){
                     fragment.update_signature(fragment.getAttendeePosition(Sender));
+                    Toast.makeText(this,"Update Signature Called" + Sender,Toast.LENGTH_LONG).show();
                 }
                 Toast.makeText(this,"You can Sign Permitted by:" + Sender,Toast.LENGTH_LONG).show();
             }
@@ -167,6 +195,7 @@ public class ViewEvent extends AppCompatActivity {
         {
             WebSocketClients.close();
         }
+        LUM = null;
         super.onDestroy();
     }
 
@@ -212,3 +241,5 @@ public class ViewEvent extends AppCompatActivity {
     }
 }
 //remember to setVisibility of sign to Invisible
+
+// Also Add role as part of the message

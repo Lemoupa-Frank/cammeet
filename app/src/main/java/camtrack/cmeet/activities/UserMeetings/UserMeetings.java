@@ -1,11 +1,7 @@
 package camtrack.cmeet.activities.UserMeetings;
 
 import androidx.annotation.NonNull;
-
-import com.google.api.services.calendar.model.Event;
-
 import java.io.Serializable;
-import java.util.List;
 
 public class UserMeetings implements Serializable {
 
@@ -13,7 +9,7 @@ public class UserMeetings implements Serializable {
 
     protected UserMeetingsPK userMeetingsPK;
 
-    private String signature;
+    private byte[] signature;
 
     private String role;
 
@@ -26,9 +22,6 @@ public class UserMeetings implements Serializable {
         this.userMeetingsPK = userMeetingsPK;
     }
 
-    public UserMeetings(String meetingId, String userId) {
-        this.userMeetingsPK = new UserMeetingsPK(meetingId, userId);
-    }
 
     public UserMeetingsPK getUserMeetingsPK() {
         return userMeetingsPK;
@@ -38,11 +31,11 @@ public class UserMeetings implements Serializable {
         this.userMeetingsPK = userMeetingsPK;
     }
 
-    public String getSignature() {
+    public byte[] getSignature() {
         return signature;
     }
 
-    public void setSignature(String signature) {
+    public void setSignature(byte[] signature) {
         this.signature = signature;
     }
 

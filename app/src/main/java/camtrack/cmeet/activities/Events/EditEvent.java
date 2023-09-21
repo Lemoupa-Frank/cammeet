@@ -48,10 +48,11 @@ public class EditEvent extends AppCompatActivity
             Retrofit R = Retrofit_Base_Class.getClient();
             Request_Maker RM = new Request_Maker();
             Dialog delaydialog = cmeet_delay.delaydialogCircular(this);
-            RM.update_meetings(R,MainActivity.cmeet_event_list.get(ClickedItem), delaydialog, EditEvent.this);
+            RM.meetings(R,MainActivity.cmeet_event_list.get(ClickedItem), delaydialog, EditEvent.this);
         });
         activityEditEventBinding.clear.setOnClickListener(v-> {finish();});
         setContentView(activityEditEventBinding.getRoot());
     }
 }
 //Implement the server side of update_meetings
+//Implement ways to update modifications made

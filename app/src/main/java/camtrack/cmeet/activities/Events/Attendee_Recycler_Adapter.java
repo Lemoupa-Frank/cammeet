@@ -6,6 +6,7 @@ import static camtrack.cmeet.activities.Events.EventAdapter.ClickedItem;
 import static camtrack.cmeet.activities.Events.ViewEvent.LUM;
 import static camtrack.cmeet.activities.MainActivity.cmeet_event_list;
 import static camtrack.cmeet.activities.MainActivity.getuser;
+import static camtrack.cmeet.activities.MainActivity.userid;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -30,15 +31,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import camtrack.cmeet.R;
 import camtrack.cmeet.Request_Maker;
 import camtrack.cmeet.activities.MainActivity;
 import camtrack.cmeet.activities.UserMeetings.UserMeetings;
+import camtrack.cmeet.retrofit.Retrofit_Base_Class;
+import retrofit2.Retrofit;
 
 public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Recycler_Adapter.ViewHolder>
 {
-
+    HashMap<String, UserMeetings> UserMeetingsHashMap;
     public ArrayList<String> attendeeList;
     private final Context context;
     LifecycleOwner lifecycleOwner;
@@ -49,6 +53,11 @@ public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Rec
         this.attendeeList = attendeeList;
         this.context = context;
         this.lifecycleOwner = lifecycleOwner;
+        if (LUM != null)
+        {
+            Request_Maker RM = new Request_Maker();
+            UserMeetingsHashMap = RM.convertAttendeesToHashMap(LUM);
+        }
     }
 
     @NonNull
@@ -67,6 +76,13 @@ public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Rec
             holder.attendeeTextView.setText("attendee_email");
         }
         holder.attendeeTextView.setText(attendee_email);
+        if( UserMeetingsHashMap != null) {
+            if (UserMeetingsHashMap.containsKey(attendee_email)) {
+                if (Objects.requireNonNull(UserMeetingsHashMap.get(attendee_email)).getRole().equals("owner")) {
+                    holder.makeowner.setImageResource(R.drawable.circular_progress_indicator);
+                }
+            }
+        }
     }
 
 
@@ -87,7 +103,7 @@ public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Rec
 
     public class ViewHolder extends RecyclerView.ViewHolder
     {
-        HashMap<String, UserMeetings> UserMeetingsHashMap;
+
         TextView attendeeTextView; ImageView makeowner, removeattendee;
         public ViewHolder(@NonNull View itemView)
         {
@@ -95,12 +111,6 @@ public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Rec
             attendeeTextView = itemView.findViewById(R.id.attendee_email);
             makeowner = itemView.findViewById(R.id.attendee_image);
             removeattendee = itemView.findViewById(R.id.Delete_attendee);
-
-            if (LUM != null)
-            {
-                Request_Maker RM = new Request_Maker();
-                UserMeetingsHashMap = RM.convertAttendeesToHashMap(LUM);
-            }
 
             if(getuser().getUserId().equals(cmeet_event_list.get(ClickedItem).getOwner()))
             {
@@ -127,11 +137,14 @@ public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Rec
                         {
                             Toast.makeText(v.getContext(), cmeet_event_list.get(ClickedItem).getAttendee()[SeletectedAttendee] + "Canot be made owner", Toast.LENGTH_LONG).show();
                         }
-                    } else {
+                    }
+                    else
+                    {
                         Toast.makeText(v.getContext(), "Please Check Your Network", Toast.LENGTH_LONG).show();
-                        //replacing the image placed
-                        //makeowner.setBackground(null);
-                        //makeowner.setImageResource(R.drawable.circular_progress_indicator);
+                        Retrofit retroObj = Retrofit_Base_Class.getClient();
+                        Request_Maker RM = new Request_Maker();
+                        new Thread(() ->
+                        {RM.getAttendees(retroObj,cmeet_event_list.get(ClickedItem).getMeetingId(),itemView.getContext());}).start();
                     }
                 });
             }
@@ -142,13 +155,7 @@ public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Rec
                 EditEvent.Selected_Event_attendeeList =  attendeeList;
             });
 
-            attendeeTextView.setOnLongClickListener(new View.OnLongClickListener()
-            {
-                @Override
-                public boolean onLongClick(View view) {
-                    return false;
-                }
-            });
+            attendeeTextView.setOnLongClickListener(view -> false);
 
 
         }
@@ -166,4 +173,11 @@ public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Rec
 
 attendeeThread.start();*/
 
-// convert attendeesArray to an arralist2
+/*
+            if(LUM.get(getAdapterPosition()).getRole().equals("owner"))
+            {
+                makeowner.setVisibility(View.VISIBLE);
+                removeattendee.setVisibility(View.VISIBLE);
+            }
+ */
+//Try to always set LUM to null on destroy

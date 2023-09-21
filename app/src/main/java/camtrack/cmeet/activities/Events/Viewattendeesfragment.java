@@ -80,6 +80,7 @@ public class Viewattendeesfragment extends Fragment
             viewHolder.removeattendee.setVisibility(View.GONE);
             viewHolder.makeowner.setBackground(null);
             viewHolder.makeowner.setImageResource(R.drawable.ic_baseline_check_24);
+            viewHolder.makeowner.setVisibility(View.VISIBLE);
         }
     }
     public ArrayList<String> getAttendeeList()
@@ -89,5 +90,17 @@ public class Viewattendeesfragment extends Fragment
     public int getAttendeePosition(String AttendeeId)
     {
         return attendeeRecyclerAdapter.attendeeList.indexOf(AttendeeId);
+    }
+
+    public int isViewVisible()
+    {
+        viewHolder = (Attendee_Recycler_Adapter.ViewHolder) recyclerView.findViewHolderForAdapterPosition(0);
+        if (viewHolder != null) {
+            return viewHolder.makeowner.getVisibility();
+        }
+        else
+        {
+            return  22;
+        }
     }
 }

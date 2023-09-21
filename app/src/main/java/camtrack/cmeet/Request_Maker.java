@@ -1,5 +1,8 @@
 package camtrack.cmeet;
 
+import static camtrack.cmeet.activities.Events.ViewEvent.MutableLUM;
+import static camtrack.cmeet.activities.MainActivity.user;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.provider.Settings;
@@ -14,8 +17,11 @@ import java.util.List;
 import camtrack.cmeet.activities.Events.ViewEvent;
 import camtrack.cmeet.activities.MainActivity;
 import camtrack.cmeet.activities.UserMeetings.UserMeetings;
+import camtrack.cmeet.activities.UserMeetings.UserMeetingsPK;
 import camtrack.cmeet.retrofit.Request_Route;
 import camtrack.cmeet.activities.Events.event_model;
+import camtrack.cmeet.websocket.Message;
+import camtrack.cmeet.websocket.webSocketClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -61,21 +67,39 @@ public class Request_Maker
      * @param retrofitObject Retrofit object already instantiated
      * @param meetsId The id of the meeting you wish to get the Users
      */
-    public void getAttendees(Retrofit retrofitObject, String meetsId)
+    public void getAttendees(Retrofit retrofitObject, String meetsId, Context con)
     {
         Request_Route RR = retrofitObject.create(Request_Route.class);
-        Call<List<UserMeetings>> getAttendees = RR.get_attendees(meetsId);
-        try
-        {
-            ViewEvent.LUM = getAttendees.execute().body();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Call<List<UserMeetings>> _getAttendees = RR.get_attendees(meetsId);
+        _getAttendees.enqueue(new Callback<List<UserMeetings>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<UserMeetings>> call, @NonNull Response<List<UserMeetings>> response) {
+                if(response.isSuccessful())
+                {
+                    ViewEvent.LUM = response.body();
+                    ViewEvent.MutableLUM.postValue(ViewEvent.LUM);
+                    Toast.makeText(con,"Success",Toast.LENGTH_LONG).show();
+                }
+                else
+                {
+                    Toast.makeText(con,"Something Went wrong",Toast.LENGTH_LONG).show();
+                    System.out.println("********************************************************");
+                    System.out.println(response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<UserMeetings>> call, @NonNull Throwable t) {
+                {
+                    Toast.makeText(con,t.toString(),Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
-    public void update_meetings(Retrofit retrofitObject, event_model cm, Dialog delaydialog, Context con)
+    public void meetings(Retrofit retrofitObject, event_model cm, Dialog delaydialog, Context con)
     {
         Request_Route RR = retrofitObject.create(Request_Route.class);
-        Call<Void> Update_Meetings_Call = RR.update_meets(cm);
+        Call<Void> Update_Meetings_Call = RR.meets(cm);
         delaydialog.show();
         Update_Meetings_Call.enqueue(new Callback<Void>() {
             @Override
@@ -92,12 +116,46 @@ public class Request_Maker
             }
 
             @Override
-            public void onFailure(@NonNull Call<Void> call, Throwable t) {
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                 delaydialog.cancel();
                 Toast.makeText(con,"Check Your Connection",Toast.LENGTH_LONG).show();
             }
         });
     }
+
+    public void  update_usermeets(Retrofit retrofitObject, UserMeetings UM, Dialog delaydialog, Context con, webSocketClient web_Socket, Message startSign, Dialog signature_dial)
+    {
+        Request_Route RR = retrofitObject.create(Request_Route.class);
+        Call<Void> Update_Meetings_Call = RR.user_meets(UM);
+        delaydialog.show();
+        Update_Meetings_Call.enqueue(new Callback<Void>()
+        {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                delaydialog.cancel();
+                if(response.isSuccessful())
+                {
+                    if(web_Socket.isOpen())
+                    {
+                        web_Socket.send(startSign.toJson());
+                    }
+                    signature_dial.cancel();
+                }
+                else
+                {
+                    Toast.makeText(con,"Something Went wrong",Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, Throwable t) {
+                delaydialog.cancel();
+                signature_dial.cancel();
+                Toast.makeText(con,"Check Your Connection",Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
 
     /**
      * Converts list of Attendees into a haspMap to allow better manipulation
@@ -114,6 +172,9 @@ public class Request_Maker
 
         return UserMeetingsHashMap;
     }
+
+
+
 }
 //http://zqktlwiuavvvqqt4ybvgvi7tyo4hjl5xgfuvpdf6otjiycgwqbym2qad.onion/wiki/The_Matrix
 /*

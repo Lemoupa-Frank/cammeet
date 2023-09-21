@@ -47,6 +47,7 @@
         <entry key="app/src/main/res/layout/frame_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/item_event.xml" value="0.1" />
         <entry key="app/src/main/res/layout/login.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/meeting_record_item.xml" value="0.20498783454987834" />
         <entry key="app/src/main/res/layout/recycler_frame.xml" value="0.1" />
         <entry key="app/src/main/res/layout/recycler_view.xml" value="0.1" />
         <entry key="app/src/main/res/layout/signed_items.xml" value="0.17552083333333332" />
