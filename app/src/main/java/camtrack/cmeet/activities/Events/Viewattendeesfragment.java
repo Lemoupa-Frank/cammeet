@@ -7,12 +7,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+
 
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleEventObserver;
-import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,7 +24,6 @@ import camtrack.cmeet.activities.MainActivity;
 
 public class Viewattendeesfragment extends Fragment
 {
-    public MutableLiveData<String> attendee_signed =  new MutableLiveData<>();
     ArrayList<String> attendeeList = null;
     Attendee_Recycler_Adapter attendeeRecyclerAdapter;
     public List<Event> googleEvents = camtrack.cmeet.activities.MainActivity.items();
@@ -87,6 +83,7 @@ public class Viewattendeesfragment extends Fragment
     {
         return attendeeRecyclerAdapter.attendeeList;
     }
+
     public int getAttendeePosition(String AttendeeId)
     {
         return attendeeRecyclerAdapter.attendeeList.indexOf(AttendeeId);

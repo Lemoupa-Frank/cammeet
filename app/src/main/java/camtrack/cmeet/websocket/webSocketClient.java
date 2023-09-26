@@ -5,13 +5,14 @@ import androidx.lifecycle.MutableLiveData;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class webSocketClient extends WebSocketClient {
     public static MutableLiveData<String>  Error =  new MutableLiveData<>();
     public  MutableLiveData<String>  _Message =  new MutableLiveData<>();
-
+    public  MutableLiveData<ByteBuffer>  ByteMessage =  new MutableLiveData<>();
     public webSocketClient(URI serverUri) {
         super(serverUri);
     }
@@ -31,11 +32,7 @@ public class webSocketClient extends WebSocketClient {
         System.out.println("Received message: " + message);
 
         _Message.postValue(message);
-        // Handle the received message
-        //Message receivedMessage = Message.fromJson(message);
-        //_Message.setValue(receivedMessage.toJson());
-       // System.out.println("Sender: " + receivedMessage.getSender());
-        //System.out.println("Content: " + receivedMessage.getMeetingId());
+
     }
 
     @Override
@@ -55,6 +52,12 @@ public class webSocketClient extends WebSocketClient {
         System.out.println("***************Connection innitiated******");
         //startConnectionTimer();
         super.connect();
+    }
+
+    @Override
+    public void onMessage(ByteBuffer bytes) {
+        super.onMessage(bytes);
+        ByteMessage.postValue(bytes);
     }
 
     private void startConnectionTimer() {

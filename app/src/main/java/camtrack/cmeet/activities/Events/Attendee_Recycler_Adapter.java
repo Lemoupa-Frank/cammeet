@@ -76,9 +76,12 @@ public class Attendee_Recycler_Adapter extends RecyclerView.Adapter<Attendee_Rec
             holder.attendeeTextView.setText("attendee_email");
         }
         holder.attendeeTextView.setText(attendee_email);
-        if( UserMeetingsHashMap != null) {
-            if (UserMeetingsHashMap.containsKey(attendee_email)) {
-                if (Objects.requireNonNull(UserMeetingsHashMap.get(attendee_email)).getRole().equals("owner")) {
+        if( UserMeetingsHashMap != null)
+        {
+            if (UserMeetingsHashMap.containsKey(attendee_email))
+            {
+                if (Objects.requireNonNull(UserMeetingsHashMap.get(attendee_email)).getRole().equals("owner"))
+                {
                     holder.makeowner.setImageResource(R.drawable.circular_progress_indicator);
                 }
             }

@@ -24,7 +24,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -46,10 +45,12 @@ import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.Events;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
+import java.util.Objects;
 
 import camtrack.cmeet.R;
 import camtrack.cmeet.Request_Maker;
@@ -66,8 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 9001;
     //Load previous events from cache data or store some default event
     public static List<event_model> cmeet_event_list; public static List<Event> items = null;
-    MutableLiveData<List<Event>> items_listener = new MutableLiveData<>();
-   // MutableLiveData<List<event_model>> cmeet_event_list_listener = new MutableLiveData<>();
+    MutableLiveData<List<Event>> items_listener;
     Request_Route request_route_instqnce; Retrofit retrofitobj;
     public DialogBinding dialogBinding;
     public TextView starttext, endtext;
@@ -92,8 +92,7 @@ public class MainActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
 
-        //cmeet_alert.displayAlertDialog(this, sharedPreferences.getString("displayName",""));
-        // Set up Google Sign-In and Google Account Credential
+        items_listener = new MutableLiveData<>();
         account = GoogleSignIn.getLastSignedInAccount(this);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -117,33 +116,30 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Initializing variables
-        {
+
             dialog = new Dialog(this);
             activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
             dialogBinding = DialogBinding.inflate(getLayoutInflater());
             delaydialog = cmeet_delay.delaydialogCircular(this);
-        }
 
 
 
-        items_listener.observe(this, new Observer<List<Event>>() {
-            @Override
-            public void onChanged(List<Event> events) {
+
+        items_listener.observe(this, events -> {
+            {
+                if(events != null)
                 {
-                    if(events != null)
                     {
-                        {
-                            retrofitobj = Retrofit_Base_Class.getClient();
-                            Request_Maker request_maker = new Request_Maker();
-                            cmeet_event_list = cmeet_from_googleEvent(items, MainActivity.this);
-                            request_maker.store_todays_meets(retrofitobj,MainActivity.this,cmeet_event_list);
-                        }
-                        MainActivityEventFragment fragment = new MainActivityEventFragment();
-                        getSupportFragmentManager()
-                                .beginTransaction()
-                                .replace(R.id.MainActivityFrag, fragment)
-                                .commit();
+                        retrofitobj = Retrofit_Base_Class.getClient();
+                        Request_Maker request_maker = new Request_Maker();
+                        cmeet_event_list = cmeet_from_googleEvent(items);
+                        request_maker.store_todays_meets(retrofitobj,MainActivity.this,cmeet_event_list);
                     }
+                    MainActivityEventFragment fragment = new MainActivityEventFragment();
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.MainActivityFrag, fragment)
+                            .commit();
                 }
             }
         });
@@ -155,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
         activityMainBinding.button.setOnClickListener(v ->
         {
             Dialog event_dial;
-            event_dial = openDialog(this);
+            event_dial = openDialog();
             if (items != null)
             {
                 MainActivityEventFragment fragment = new MainActivityEventFragment();
@@ -189,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             Log.d("MainActivity", "handleSignInResult: " + e.getMessage());
-            System.out.println("**************Line 139 Mainactivity" + e);
+            System.out.println("**************Line 192 Mainactivity" + e);
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
@@ -207,10 +203,10 @@ public class MainActivity extends AppCompatActivity {
                 .setApplicationName("cammeet")
                 .build();
 
-
+//DateTime.parseRfc3339("2023-05-09T13:40:09.000Z")
         try {
             events = service.events().list("primary")
-                    .setMaxResults(50)
+                    .setMaxResults(100)
                     .setTimeMin(Start)
                     .setTimeMax(end)
                     .setOrderBy("startTime")
@@ -241,13 +237,13 @@ public class MainActivity extends AppCompatActivity {
         } catch (UserRecoverableAuthIOException e) {
             // Handle user-authorization errors
             startActivityForResult(e.getIntent(), RC_SIGN_IN);
-            System.out.println("***************UserRecoverableAuthIOException ***************" + e);
+            System.out.println("***************UserRecoverableAuthIOException ***************  line 244" + e);
             //Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
         } // Handle authorization errors
         catch (IOException e) {
             // Handle Google API errors
             //Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show().;
-            System.out.println("*****************IOException************* line 174 " + e);
+            System.out.println("*****************IOException************* line 250 " + e);
         }// Handle other I/O errors
         return items;
     }
@@ -295,14 +291,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public Dialog openDialog(Context con) {
+    public Dialog openDialog() {
         dialog.setContentView(R.layout.dialog);
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         int width = size.x;
         int height = size.y;
-        dialog.getWindow().setLayout(5 * (width) / 7, 5 * (height) / 7);
+        Objects.requireNonNull(dialog.getWindow()).setLayout(5 * (width) / 7, 5 * (height) / 7);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.setCanceledOnTouchOutside(false);
         return dialog;
@@ -312,11 +308,11 @@ public class MainActivity extends AppCompatActivity {
         DatePickerFragment newFragment = new DatePickerFragment();
         starttext = dialog.findViewById(R.id.textstartdate);
         newFragment.setListener((year, month, dayOfMonth) -> {
-            // Update the TextView with the selected date
-            String selectedDate = String.format(Locale.getDefault(), "%d-%02d-%02d", year, month, dayOfMonth);
-            DateTime dateTime = DateTime.parseRfc3339(selectedDate);
-            starttext.setText(selectedDate);
-            startdatetemp = dateTime;
+            LocalDateTime dateTimes = LocalDateTime.of(year, month, dayOfMonth,0,0,0,0);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            String formattedDate = dateTimes.format(formatter);
+            startdatetemp = DateTime.parseRfc3339(formattedDate);
+
         });
         newFragment.show(getSupportFragmentManager(), "StartDate");
     }
@@ -325,10 +321,11 @@ public class MainActivity extends AppCompatActivity {
         DatePickerFragment newFragment = new DatePickerFragment();
         endtext = dialog.findViewById(R.id.textendtdate);
         newFragment.setListener((year, month, dayOfMonth) -> {
-            String selectedDate = String.format(Locale.getDefault(), "%d-%02d-%02d", year, month, dayOfMonth);
-            DateTime dateTime = DateTime.parseRfc3339(selectedDate);
-            endtext.setText(selectedDate);
-            enddatetemp = dateTime;
+
+            LocalDateTime dateTimes = LocalDateTime.of(year, month, dayOfMonth,0,0,0,0);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            String formattedDate = dateTimes.format(formatter);
+            enddatetemp = DateTime.parseRfc3339(formattedDate);
         });
         newFragment.show(getSupportFragmentManager(), "EndDate");
     }
@@ -351,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public List<event_model> cmeet_from_googleEvent(List<Event> myevent, Context con)
+    public List<event_model> cmeet_from_googleEvent(List<Event> myevent)
     {
 
         List<event_model> LEM = new ArrayList<>();
@@ -393,3 +390,5 @@ public class MainActivity extends AppCompatActivity {
         return user;
     }
 }
+
+// do a call to the cmeet database if you ecounter an exception in getEvents

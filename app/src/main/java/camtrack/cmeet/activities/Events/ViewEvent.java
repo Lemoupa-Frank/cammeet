@@ -6,23 +6,29 @@ import static camtrack.cmeet.activities.Events.EventAdapter.ClickedItem;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+
 import java.io.ByteArrayOutputStream;
 
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import camtrack.cmeet.R;
 import camtrack.cmeet.Request_Maker;
@@ -43,20 +49,24 @@ import retrofit2.Retrofit;
 
 public class ViewEvent extends AppCompatActivity {
     ActivityViewEventBinding viewEventBinding;
+
+
     int Selected_Event; Retrofit retrofitobj;
     public List<Event> a = MainActivity.items();
-    static public MutableLiveData<List<UserMeetings>> MutableLUM = new MutableLiveData<>();
+
+    static public MutableLiveData<String> observe_signature_click;
+
+    static Observer<String> observer_signature;
     static public List<UserMeetings> LUM; // A network call is done once an event is selected to modify LUM
     // Make LUM mutable, so you can Create viewevent fragment and if LUM loads and is non null recreate it
     public List<event_model> event_List = MainActivity.get_cmeet_event_list();
     private webSocketClient WebSocketClients;
     boolean Signable;
     Message startSign;
-    Event event ;
-    UserMeetings Present_Attendee;
     event_model eventmodel;
     URI serverUri = null;
     boolean event_owner = false;
+    TableFragment tableFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -64,6 +74,7 @@ public class ViewEvent extends AppCompatActivity {
         //Owners in the Attendee Recycler fragment will be determin by this
         // You can put a mutable boolean to create fragment once you
         // get a network reply
+        observe_signature_click = new MutableLiveData<>();
         User user = MainActivity.getuser();
         super.onCreate(savedInstanceState);
         Selected_Event = ClickedItem;
@@ -85,12 +96,11 @@ public class ViewEvent extends AppCompatActivity {
         viewEventBinding.startsigning.setVisibility(eventmodel.getOwner().equals(user.getUserId())?View.VISIBLE:View.INVISIBLE);
 
 
-            Viewattendeesfragment fragment = new Viewattendeesfragment();
-            getSupportFragmentManager()
+        Viewattendeesfragment fragment = new Viewattendeesfragment();
+        getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.attendeesfragment, fragment)
                     .commit();
-
 
 
 
@@ -126,8 +136,15 @@ public class ViewEvent extends AppCompatActivity {
 
         });
 
-        viewEventBinding.sign.setOnClickListener(v->
-        {
+
+        viewEventBinding.sign.setOnClickListener(f->{
+            viewEventBinding.addparticipant.setVisibility(View.GONE);
+            tableFragment = new TableFragment();
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.attendeesfragment, tableFragment); // Replace R.id.fragmentContainer with the ID of your fragment container
+            transaction.commit();});
+
+        observer_signature = s -> {
             startSign = new Message();
             startSign.setMeetingId(event_List.get(Selected_Event).getMeetingId());
             startSign.setSender(user.getUserId());
@@ -138,6 +155,7 @@ public class ViewEvent extends AppCompatActivity {
             SignatureView ss = signature_dial.findViewById(R.id.signatureView);
             signature_dial.findViewById(R.id.sign_event).setOnClickListener(view -> {
                 Bitmap BitSignature = ss.getSignatureBitmap();
+                startSign.setSignature(resizeBitmap(BitSignature,75,75));
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 BitSignature.compress(Bitmap.CompressFormat.JPEG, 100, stream); // Adjust the quality value as needed
                 byte[] byteArray = stream.toByteArray();
@@ -152,16 +170,18 @@ public class ViewEvent extends AppCompatActivity {
                 Request_Maker request_maker = new Request_Maker();
                 Dialog cdelay =  cmeet_delay.delaydialogCircular(ViewEvent.this);
                 request_maker.update_usermeets(retrofit,userInmeet,cdelay,ViewEvent.this,wb,startSign,signature_dial);
+                tableFragment.changeColumnImage(tableFragment.owner_index,startSign.getSignature());
+
             });
             signature_dial.findViewById(R.id.restartsignature).setOnClickListener(view ->
-            {
-                ss.clearSignature();
-            });
-        });
+                    ss.clearSignature());
+        };
+        observe_signature_click.observe(this,observer_signature);
+
         wb._Message.observe(this,v->
         {
 
-            JsonObject json = JsonParser.parseString(wb._Message.getValue()).getAsJsonObject();
+            JsonObject json = JsonParser.parseString(Objects.requireNonNull(wb._Message.getValue())).getAsJsonObject();
             if(json.size() != 0)
             {
                 String Sender = json.get("sender").getAsString();
@@ -174,16 +194,36 @@ public class ViewEvent extends AppCompatActivity {
                 }
                 if(Signable)
                 {
-                    viewEventBinding.sign.setVisibility(View.VISIBLE);
+                    viewEventBinding.addparticipant.setVisibility(View.GONE);
+                    tableFragment = new TableFragment();
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.attendeesfragment, tableFragment); // Replace R.id.fragmentContainer with the ID of your fragment container
+                    transaction.commit();
+                    Signable = false;
                 }
-                if(event_List.get(Selected_Event).getAttendee() != null){
-                    fragment.update_signature(fragment.getAttendeePosition(Sender));
-                    Toast.makeText(this,"Update Signature Called" + Sender,Toast.LENGTH_LONG).show();
+
+
+
+
+                viewEventBinding.addparticipant.setVisibility(View.GONE);
+                if(event_List.get(Selected_Event).getAttendee() != null && json.get("Signable") != null)
+                {
                 }
-                Toast.makeText(this,"You can Sign Permitted by:" + Sender,Toast.LENGTH_LONG).show();
+                wb.ByteMessage.observe(this,a->{
+                    ByteBuffer bytes =  wb.ByteMessage.getValue();
+                    String jsons = new String(Objects.requireNonNull(bytes).array(), bytes.position(), bytes.remaining());
+
+                    // Deserialize the JSON string to your object
+                    Gson gson = new Gson();
+                    Message myObject = gson.fromJson(jsons, Message.class);
+                    System.out.println(jsons);
+                    tableFragment.changeColumnImage(tableFragment.owner_index,myObject.getSignature());
+                });
             }
-            // think about making signable false when meeting ends
         });
+
+
+
         setContentView(viewEventBinding.getRoot());
 
     }
@@ -195,6 +235,7 @@ public class ViewEvent extends AppCompatActivity {
         {
             WebSocketClients.close();
         }
+        observe_signature_click.removeObserver(observer_signature);
         LUM = null;
         super.onDestroy();
     }
@@ -238,6 +279,12 @@ public class ViewEvent extends AppCompatActivity {
         {
             edittext.setVisibility(View.INVISIBLE);
         }
+    }
+    public Bitmap resizeBitmap(Bitmap originalBitmap, int desiredDpWidth, int desiredDpHeight) {
+        int desiredPxWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, desiredDpWidth, getResources().getDisplayMetrics());
+        int desiredPxHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, desiredDpHeight, getResources().getDisplayMetrics());
+
+        return Bitmap.createScaledBitmap(originalBitmap, desiredPxWidth, desiredPxHeight, true);
     }
 }
 //remember to setVisibility of sign to Invisible

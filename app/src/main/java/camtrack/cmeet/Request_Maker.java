@@ -1,7 +1,5 @@
 package camtrack.cmeet;
 
-import static camtrack.cmeet.activities.Events.ViewEvent.MutableLUM;
-import static camtrack.cmeet.activities.MainActivity.user;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -10,7 +8,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.google.gson.Gson;
+
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 
@@ -77,7 +78,6 @@ public class Request_Maker
                 if(response.isSuccessful())
                 {
                     ViewEvent.LUM = response.body();
-                    ViewEvent.MutableLUM.postValue(ViewEvent.LUM);
                     Toast.makeText(con,"Success",Toast.LENGTH_LONG).show();
                 }
                 else
@@ -99,7 +99,7 @@ public class Request_Maker
     public void meetings(Retrofit retrofitObject, event_model cm, Dialog delaydialog, Context con)
     {
         Request_Route RR = retrofitObject.create(Request_Route.class);
-        Call<Void> Update_Meetings_Call = RR.meets(cm);
+        Call<Void> Update_Meetings_Call = RR.update_meetes(cm);
         delaydialog.show();
         Update_Meetings_Call.enqueue(new Callback<Void>() {
             @Override
@@ -111,7 +111,7 @@ public class Request_Maker
                 }
                 else
                 {
-                    Toast.makeText(con,"Something Went wrong",Toast.LENGTH_LONG).show();
+                    Toast.makeText(con,response.code() + " ",Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -137,7 +137,10 @@ public class Request_Maker
                 {
                     if(web_Socket.isOpen())
                     {
-                        web_Socket.send(startSign.toJson());
+                        Gson gson = new Gson();
+                        String json = gson.toJson(startSign);
+                        byte[] bytess = json.getBytes();
+                        web_Socket.send(ByteBuffer.wrap(bytess));
                     }
                     signature_dial.cancel();
                 }

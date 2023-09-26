@@ -1,11 +1,23 @@
 package camtrack.cmeet.websocket;
 
+import android.graphics.Bitmap;
+
 import com.google.gson.Gson;
 
 public class Message {
     private String sender;
     private String MeetingId;
+    private String Name;
+    private Bitmap Signature;
     private Boolean Signable;
+
+    public Bitmap getSignature() {
+        return Signature;
+    }
+
+    public void setSignature(Bitmap signature) {
+        Signature = signature;
+    }
 
     public Boolean getSignable() {
         return Signable;
@@ -15,7 +27,13 @@ public class Message {
         Signable = signable;
     }
 
-    
+    public String getName() {
+        return Name;
+    }
+
+    public void setName(String name) {
+        Name = name;
+    }
 
     // Constructors, getters, and setters
 
