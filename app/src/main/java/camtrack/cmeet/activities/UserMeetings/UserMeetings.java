@@ -9,11 +9,20 @@ public class UserMeetings implements Serializable {
 
     protected UserMeetingsPK userMeetingsPK;
 
-    private byte[] signature;
-
+    private String signature;
+// Replace with userid, this will be send to the server to append it to the uris
     private String role;
-
     private Boolean signable;
+
+    byte[] signature_data;
+
+    public byte[] getSignature_data() {
+        return signature_data;
+    }
+
+    public void setSignature_data(byte[] signature_data) {
+        this.signature_data = signature_data;
+    }
 
     public UserMeetings() {
     }
@@ -31,11 +40,11 @@ public class UserMeetings implements Serializable {
         this.userMeetingsPK = userMeetingsPK;
     }
 
-    public byte[] getSignature() {
+    public String getSignature() {
         return signature;
     }
 
-    public void setSignature(byte[] signature) {
+    public void setSignature(String signature) {
         this.signature = signature;
     }
 

@@ -58,6 +58,8 @@ public class Signup extends AppCompatActivity {
         {
             if(isAllEditTextFilled(Editform))
             {
+                newuser = new User(signupbinding.Email.getText().toString(),signupbinding.username.getText().toString(),signupbinding.phone.getText().toString(),signupbinding.department.getSelectedItem().toString());
+                newuser.set_password(signupbinding.password.getText().toString());
                 Creat_User(request_route,retrofitobj);
             }
             else
@@ -160,7 +162,7 @@ public class Signup extends AppCompatActivity {
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t)
             {
                 delaydialog.cancel();
-                Toast.makeText(Signup.this, R.string.Server_down, Toast.LENGTH_LONG).show();
+                Toast.makeText(Signup.this, t.toString(), Toast.LENGTH_LONG).show();
             }
         });
     }

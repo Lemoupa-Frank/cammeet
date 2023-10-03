@@ -25,7 +25,7 @@ public interface Request_Route
 
     @Headers("Content-Type: application/json")
     @POST("store_meet")
-    Call<Void> store_meets(@Body  List<event_model> lem);
+    Call<List<event_model>> store_meets(@Body  List<event_model> lem);
 
     @GET("store_meet/My_meets")
     Call<List<event_model>> get_meets(@Query("userid") String userid);
@@ -39,7 +39,7 @@ public interface Request_Route
     @POST("store_meet/update_meetings")
     Call<Void> update_meetes(@Body  event_model lem);
 
-    @POST("store_meet/user_meetings")
+    @POST("store_meet/update_user_meetings")
     Call<Void> user_meets(@Body UserMeetings UM);
 
     @GET("user/MyMeeting")

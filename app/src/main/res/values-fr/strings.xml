@@ -36,6 +36,7 @@
     <string name="validate"> valider </string>
     <string name="cancel"> Annuler </string>
     <string name="authorise_siging">Autoriser les signature</string>
+    <string name="end_signing">Arreter Les signature</string>
     <string name="sign">signé</string>
 
 </resources>

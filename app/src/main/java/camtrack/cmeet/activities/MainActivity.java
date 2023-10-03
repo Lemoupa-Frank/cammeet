@@ -1,6 +1,7 @@
 package camtrack.cmeet.activities;
 
 
+import static android.os.Build.VERSION_CODES.R;
 import static camtrack.cmeet.activities.DatePickerFragment.enddate;
 import static camtrack.cmeet.activities.DatePickerFragment.enddatetemp;
 import static camtrack.cmeet.activities.DatePickerFragment.startdate;
@@ -52,7 +53,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import camtrack.cmeet.R;
+import camtrack.cmeet.R.id;
+import camtrack.cmeet.R.layout;
 import camtrack.cmeet.Request_Maker;
 import camtrack.cmeet.activities.Events.MainActivityEventFragment;
 import camtrack.cmeet.activities.Events.event_model;
@@ -68,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
     //Load previous events from cache data or store some default event
     public static List<event_model> cmeet_event_list; public static List<Event> items = null;
     MutableLiveData<List<Event>> items_listener;
+
+    MutableLiveData<List<event_model>> cmeet_item_listener;
     Request_Route request_route_instqnce; Retrofit retrofitobj;
     public DialogBinding dialogBinding;
     public TextView starttext, endtext;
@@ -80,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     private GoogleSignInClient googleSignInClient;
     private  GoogleAccountCredential googleAccountCredential;
     public static User user;
-
+    public static String user_name;
     public static List<Event> items() {
         return items;
     }
@@ -93,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         items_listener = new MutableLiveData<>();
+        cmeet_item_listener = new MutableLiveData<>();
         account = GoogleSignIn.getLastSignedInAccount(this);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -129,19 +134,27 @@ public class MainActivity extends AppCompatActivity {
             {
                 if(events != null)
                 {
-                    {
+
                         retrofitobj = Retrofit_Base_Class.getClient();
                         Request_Maker request_maker = new Request_Maker();
                         cmeet_event_list = cmeet_from_googleEvent(items);
-                        request_maker.store_todays_meets(retrofitobj,MainActivity.this,cmeet_event_list);
-                    }
-                    MainActivityEventFragment fragment = new MainActivityEventFragment();
-                    getSupportFragmentManager()
+                        request_maker.store_todays_meets(retrofitobj,MainActivity.this,cmeet_event_list, cmeet_item_listener);
+                        MainActivityEventFragment fragment = new MainActivityEventFragment();
+                            getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.MainActivityFrag, fragment)
+                            .replace(id.MainActivityFrag, fragment)
                             .commit();
                 }
             }
+        });
+
+        cmeet_item_listener.observe(MainActivity.this,cmeet_events->
+        {
+            MainActivityEventFragment fragment = new MainActivityEventFragment();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(id.MainActivityFrag, fragment)
+                    .commit();
         });
 
         async();
@@ -156,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
             {
                 MainActivityEventFragment fragment = new MainActivityEventFragment();
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.MainActivityFrag, fragment)
+                        .replace(id.MainActivityFrag, fragment)
                         .commit();
             }
             event_dial.show();
@@ -182,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
             GoogleSignInAccount account = completedTask.getResult();
             if (account != null) {
                 googleAccountCredential.setSelectedAccount(account.getAccount());
+                user_name = account.getEmail();
             }
         } catch (Exception e) {
             Log.d("MainActivity", "handleSignInResult: " + e.getMessage());
@@ -202,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
         Calendar service = new Calendar.Builder(transport, jsonFactory, googleAccountCredential)
                 .setApplicationName("cammeet")
                 .build();
-
+            DateTime begin;
 //DateTime.parseRfc3339("2023-05-09T13:40:09.000Z")
         try {
             events = service.events().list("primary")
@@ -238,11 +252,11 @@ public class MainActivity extends AppCompatActivity {
             // Handle user-authorization errors
             startActivityForResult(e.getIntent(), RC_SIGN_IN);
             System.out.println("***************UserRecoverableAuthIOException ***************  line 244" + e);
-            //Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, "There was a problem with the authentication", Toast.LENGTH_LONG).show();
         } // Handle authorization errors
         catch (IOException e) {
             // Handle Google API errors
-            //Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show().;
+            Toast.makeText(MainActivity.this,"An Exception Occured", Toast.LENGTH_LONG).show();
             System.out.println("*****************IOException************* line 250 " + e);
         }// Handle other I/O errors
         return items;
@@ -292,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public Dialog openDialog() {
-        dialog.setContentView(R.layout.dialog);
+        dialog.setContentView(layout.dialog);
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -306,26 +320,27 @@ public class MainActivity extends AppCompatActivity {
 
     public void StartDatePickerDialog(View view) {
         DatePickerFragment newFragment = new DatePickerFragment();
-        starttext = dialog.findViewById(R.id.textstartdate);
+        starttext = dialog.findViewById(id.textstartdate);
         newFragment.setListener((year, month, dayOfMonth) -> {
             LocalDateTime dateTimes = LocalDateTime.of(year, month, dayOfMonth,0,0,0,0);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             String formattedDate = dateTimes.format(formatter);
             startdatetemp = DateTime.parseRfc3339(formattedDate);
-
+            starttext.setText(startdatetemp.toString());
         });
         newFragment.show(getSupportFragmentManager(), "StartDate");
     }
 
     public void EndDatePickerDialog(View view) {
         DatePickerFragment newFragment = new DatePickerFragment();
-        endtext = dialog.findViewById(R.id.textendtdate);
+        endtext = dialog.findViewById(id.textendtdate);
         newFragment.setListener((year, month, dayOfMonth) -> {
 
             LocalDateTime dateTimes = LocalDateTime.of(year, month, dayOfMonth,0,0,0,0);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             String formattedDate = dateTimes.format(formatter);
             enddatetemp = DateTime.parseRfc3339(formattedDate);
+            endtext.setText(enddatetemp.toString());
         });
         newFragment.show(getSupportFragmentManager(), "EndDate");
     }
@@ -352,6 +367,7 @@ public class MainActivity extends AppCompatActivity {
     {
 
         List<event_model> LEM = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
         for (Event ev : myevent)
         {
             event_model cm = new event_model();
@@ -360,8 +376,8 @@ public class MainActivity extends AppCompatActivity {
             cm.setNumberOfParticipants(ev.getAttendees()==null?0:ev.getAttendees().size());
             cm.setOwner(ev.getOrganizer().getEmail()==null?ev.getCreator().getId():ev.getOrganizer().getEmail());
             cm.setDateofcreation(ev.getCreated().toString());
-            cm.setStartdate(ev.getStart().getDate()==null?"none":ev.getStart().getDate().toString());
-            cm.setEnddate(ev.getEnd().getDate()==null?"none":ev.getEnd().toString());
+            cm.setStartdate(ev.getStart().getDateTime() == null?null:ev.getStart().getDateTime().toString());
+            cm.setEnddate(ev.getEnd().getDateTime() == null?null:ev.getEnd().getDateTime().toString());
             cm.setDescription(ev.getDescription()==null?"none":ev.getDescription());
             cm.setTitle(ev.getSummary()==null?"none":ev.getSummary());
             cm.setAttendee(getAttendees(ev.getAttendees()));
@@ -369,6 +385,7 @@ public class MainActivity extends AppCompatActivity {
             LEM.add(cm);
         }
         cmeet_event_list = LEM;
+        //Toast.makeText(this,cmeet_event_list.get(0).getDateofcreation(),Toast.LENGTH_LONG).show();
         return LEM;
     }
     public static String[] getAttendees(List<EventAttendee> attendeesList)
@@ -392,3 +409,10 @@ public class MainActivity extends AppCompatActivity {
 }
 
 // do a call to the cmeet database if you ecounter an exception in getEvents
+
+
+// At line 128 after events have been filled by google and placed cmeet_eveent_list
+// cmeet_eveent_list is used to update cmeet database
+// Here what you rather do is get events for that day from cmeet db which where inserted from cmeet_eveent_list only if there
+// there were new, the events getten from cmeet db are returned and that is what is displayed in the fragment
+// this will imply you need to assert events from then to the end of that day after and ony after all events have been inserted

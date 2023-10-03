@@ -7,6 +7,7 @@ import android.provider.Settings;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
 
 import com.google.gson.Gson;
 
@@ -36,16 +37,18 @@ import retrofit2.Retrofit;
 
 public class Request_Maker
 {
-    public void store_todays_meets(Retrofit retrofitObject, Context con, List<event_model> a)
+    public void store_todays_meets(Retrofit retrofitObject, Context con, List<event_model> a, MutableLiveData<List<event_model>> cmeet_list_observer)
     {
         Request_Route RR = retrofitObject.create(Request_Route.class);
-        Call<Void> CreateUserCall = RR.store_meets(a);
-        CreateUserCall.enqueue(new Callback<Void>() {
+        Call<List<event_model>> CreateUserCall = RR.store_meets(a);
+        CreateUserCall.enqueue(new Callback<List<event_model>>() {
             @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response)
+            public void onResponse(@NonNull Call<List<event_model>> call, @NonNull Response<List<event_model>> response)
             {
                 if(response.isSuccessful())
                 {
+                    cmeet_list_observer.postValue(response.body());
+                    MainActivity.cmeet_event_list = response.body();
                     Toast.makeText(con, R.string.TrustMessage, Toast.LENGTH_LONG).show();
                 }
                 else
@@ -55,7 +58,7 @@ public class Request_Maker
             }
 
             @Override
-            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t)
+            public void onFailure(@NonNull Call<List<event_model>> call, @NonNull Throwable t)
             {
                 Toast.makeText(con, t.toString(), Toast.LENGTH_LONG).show();
             }

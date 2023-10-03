@@ -40,6 +40,7 @@ public class SignatureView extends View {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
         canvasBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(canvasBitmap);
+        clearSignature();
     }
 
     @Override

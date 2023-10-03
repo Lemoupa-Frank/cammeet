@@ -5,6 +5,7 @@ public class User {
     private final String display_name;
     private final String number;
     private final String department;
+    private  String password;
 
     /**A constructor to fully initialize user for
      * his session
@@ -47,6 +48,6 @@ public class User {
         return department;
     }
 
-
+    public void set_password(String password){this.password = password;}
 
 }

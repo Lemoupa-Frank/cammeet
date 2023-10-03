@@ -36,6 +36,7 @@
     <string name="validate"> validate </string>
     <string name="cancel"> Cancel </string>
     <string name="authorise_siging">Athorise Signing</string>
+    <string name="end_signing">Stop Signing</string>
     <string name="sign">sign Event</string>
     <string-array name="Departments">
         <item>Informatique</item>

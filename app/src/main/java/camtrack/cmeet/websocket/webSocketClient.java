@@ -1,5 +1,7 @@
 package camtrack.cmeet.websocket;
 
+import static camtrack.cmeet.activities.Events.EventAdapter.ClickedItem;
+
 import androidx.lifecycle.MutableLiveData;
 
 import org.java_websocket.client.WebSocketClient;
@@ -8,6 +10,8 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import camtrack.cmeet.activities.MainActivity;
 
 public class webSocketClient extends WebSocketClient {
     public static MutableLiveData<String>  Error =  new MutableLiveData<>();
@@ -22,9 +26,6 @@ public class webSocketClient extends WebSocketClient {
     @Override
     public void onOpen(ServerHandshake handshakedata) {
         System.out.println("Connected to WebSocket");
-        // Send a message to the server
-        Message message = new Message("Client1", "Hello, Server!");
-        send(message.toJson());
     }
 
     @Override
@@ -50,8 +51,9 @@ public class webSocketClient extends WebSocketClient {
 
     public void connect() {
         System.out.println("***************Connection innitiated******");
-        //startConnectionTimer();
+        addHeader("X-UID", MainActivity.get_cmeet_event_list().get(ClickedItem).getMeetingId());
         super.connect();
+
     }
 
     @Override

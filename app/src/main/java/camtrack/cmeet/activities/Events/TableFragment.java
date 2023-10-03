@@ -3,8 +3,11 @@ package camtrack.cmeet.activities.Events;
 import static camtrack.cmeet.activities.Events.EventAdapter.ClickedItem;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +25,7 @@ import camtrack.cmeet.activities.MainActivity;
 public class TableFragment extends Fragment {
 
     public TableLayout tableLayout;
-
-    public int owner_index = -2;
+    
 
 
     public TableFragment() {
@@ -45,7 +47,6 @@ public class TableFragment extends Fragment {
     private void addRowsToTable() {
         // Sample data for columns
         String[] Attendee = MainActivity.cmeet_event_list.get(ClickedItem).getAttendee();
-
 
         int columnThreeImageResource = R.drawable.ic_launcher_foreground;
         int Number_Rows = MainActivity.cmeet_event_list.get(ClickedItem).getAttendee() == null ? 0 : MainActivity.cmeet_event_list.get(ClickedItem).getAttendee().length;
@@ -79,12 +80,6 @@ public class TableFragment extends Fragment {
 
                     }
                 });
-
-            if(check_owner_pos(Attendee[i]))
-            {
-                owner_index = i;
-            }
-
 
             TextView attendee_text_holder = new TextView(requireContext());
 
@@ -128,24 +123,22 @@ public class TableFragment extends Fragment {
         }
     }
 
-    public void changeColumnImage(int rowIndex,Bitmap bitmap) {
+    public void changeColumnImage(int rowIndex,Bitmap bitmap)
+    {
         row = (TableRow) tableLayout.getChildAt(rowIndex + 1); // Get the desired row
+        //Bitmap sbitmap = resizeBitmap(bitmap,75,75);
         if (row != null) {
+            bitmap.setPremultiplied(true);
             View columnView = row.getChildAt(2); // Get the desired column view
             ImageView columnImageView = (ImageView) columnView; // Cast the column view to ImageView
-            columnImageView.setImageBitmap(bitmap); // Set the new image resource
+            columnImageView.setImageBitmap(bitmap);
         }
         else
         {
             Toast.makeText(getContext(), "Participant Not Found", Toast.LENGTH_SHORT).show();
         }
     }
-
-    private boolean check_owner_pos(String email)
-    {
-
-      return email.equals(MainActivity.userid);
-    }
+    
     public static String extractNameFromEmail(String email) {
         String[] parts = email.split("@"); // Split email address into username and domain
         String username = parts[0];
@@ -164,6 +157,8 @@ public class TableFragment extends Fragment {
 
         return capitalizedName.toString().trim();
     }
+
+
 }
 /*
 <shape xmlns:android="http://schemas.android.com/apk/res/android">

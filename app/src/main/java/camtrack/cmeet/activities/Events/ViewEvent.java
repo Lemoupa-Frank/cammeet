@@ -61,7 +61,7 @@ public class ViewEvent extends AppCompatActivity {
     // Make LUM mutable, so you can Create viewevent fragment and if LUM loads and is non null recreate it
     public List<event_model> event_List = MainActivity.get_cmeet_event_list();
     private webSocketClient WebSocketClients;
-    boolean Signable;
+    boolean Signable = false;
     Message startSign;
     event_model eventmodel;
     URI serverUri = null;
@@ -116,15 +116,18 @@ public class ViewEvent extends AppCompatActivity {
             {
                 startSign = new Message();
                 startSign.setMeetingId(event_List.get(Selected_Event).getMeetingId());
-                startSign.setSignable(true);
+                startSign.setSignable(!Signable);
                 startSign.setSender(user.getUserId());
                 viewEventBinding.edit.setVisibility(View.GONE);
                 wb.send(startSign.toJson());
             }
             else
             {
-                recreate();
-                Toast.makeText(ViewEvent.this,"An error occured please try again",Toast.LENGTH_LONG).show();
+                if(!Signable)
+                {
+                    recreate();
+                    Toast.makeText(ViewEvent.this,"An error occured please try again",Toast.LENGTH_LONG).show();
+                }
             }
         });
         viewEventBinding.edit.setOnClickListener(v->
@@ -142,40 +145,46 @@ public class ViewEvent extends AppCompatActivity {
             tableFragment = new TableFragment();
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.attendeesfragment, tableFragment); // Replace R.id.fragmentContainer with the ID of your fragment container
-            transaction.commit();});
+            transaction.commit();
+        });
 
-        observer_signature = s -> {
+        observer_signature = s ->
+        {
             startSign = new Message();
             startSign.setMeetingId(event_List.get(Selected_Event).getMeetingId());
             startSign.setSender(user.getUserId());
-
-
             Dialog signature_dial = _Dialog.BottomSignature(ViewEvent.this);
-            signature_dial.show();
-            SignatureView ss = signature_dial.findViewById(R.id.signatureView);
-            signature_dial.findViewById(R.id.sign_event).setOnClickListener(view -> {
-                Bitmap BitSignature = ss.getSignatureBitmap();
-                startSign.setSignature(resizeBitmap(BitSignature,75,75));
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                BitSignature.compress(Bitmap.CompressFormat.JPEG, 100, stream); // Adjust the quality value as needed
-                byte[] byteArray = stream.toByteArray();
-                UserMeetings userInmeet = new UserMeetings();
-                UserMeetingsPK UMPK = new UserMeetingsPK();
-                System.out.println(Arrays.toString(byteArray));
-                UMPK.setMeetingId(event_List.get(Selected_Event).getMeetingId());
-                UMPK.setUserId(user.getUserId());
-                userInmeet.setUserMeetingsPK(UMPK);
-                userInmeet.setSignature(byteArray);
-                Retrofit retrofit = Retrofit_Base_Class.getClient();
-                Request_Maker request_maker = new Request_Maker();
-                Dialog cdelay =  cmeet_delay.delaydialogCircular(ViewEvent.this);
-                request_maker.update_usermeets(retrofit,userInmeet,cdelay,ViewEvent.this,wb,startSign,signature_dial);
-                tableFragment.changeColumnImage(tableFragment.owner_index,startSign.getSignature());
-
-            });
-            signature_dial.findViewById(R.id.restartsignature).setOnClickListener(view ->
-                    ss.clearSignature());
-        };
+            if (Signable)
+            {
+                signature_dial.show();
+                SignatureView ss = signature_dial.findViewById(R.id.signatureView);
+                signature_dial.findViewById(R.id.sign_event).setOnClickListener(view ->
+                {
+                    Bitmap BitSignature = ss.getSignatureBitmap();
+                    startSign.setSignature(BitSignature);
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    BitSignature.compress(Bitmap.CompressFormat.JPEG, 50, stream); // Adjust the quality value as needed
+                    byte[] byteArray = stream.toByteArray();
+                    UserMeetings userInmeet = new UserMeetings();
+                    UserMeetingsPK UMPK = new UserMeetingsPK();
+                    System.out.println(Arrays.toString(byteArray));
+                    UMPK.setMeetingId(event_List.get(Selected_Event).getMeetingId());
+                    UMPK.setUserId(user.getUserId());
+                    userInmeet.setUserMeetingsPK(UMPK);
+                    userInmeet.setSignature_data(byteArray);
+                    userInmeet.setSignature(":cmeetSignatures" + UMPK.getUserId());
+                    Retrofit retrofit = Retrofit_Base_Class.getClient();
+                    Request_Maker request_maker = new Request_Maker();
+                    Dialog cdelay =  cmeet_delay.delaydialogCircular(ViewEvent.this);
+                    request_maker.update_usermeets(retrofit,userInmeet,cdelay,ViewEvent.this,wb,startSign,signature_dial);
+                    /*Gson gson = new Gson();
+                    String json = gson.toJson(startSign);
+                    byte[] bytess = json.getBytes();
+                    wb.send(ByteBuffer.wrap(bytess));*/
+                });
+                signature_dial.findViewById(R.id.restartsignature).setOnClickListener(view ->
+                        ss.clearSignature());
+        };};
         observe_signature_click.observe(this,observer_signature);
 
         wb._Message.observe(this,v->
@@ -190,38 +199,49 @@ public class ViewEvent extends AppCompatActivity {
                     if(json.get("Signable") != null)
                     {
                         Signable = json.get("Signable").getAsBoolean();
+                        if(Signable)
+                        {
+                            viewEventBinding.addparticipant.setVisibility(View.GONE);
+                            tableFragment = new TableFragment();
+                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                            transaction.replace(R.id.attendeesfragment, tableFragment);
+                            transaction.commit();
+                            viewEventBinding.startsigning.setText(R.string.end_signing);
+                        }
+                        else
+                        {
+                            if(tableFragment == null)
+                            {
+                                viewEventBinding.addparticipant.setVisibility(View.GONE);
+                                tableFragment = new TableFragment();
+                                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                transaction.replace(R.id.attendeesfragment, tableFragment);
+                                transaction.commit();
+                            }
+                                viewEventBinding.startsigning.setVisibility(View.GONE);
+                        }
                     }
                 }
-                if(Signable)
-                {
-                    viewEventBinding.addparticipant.setVisibility(View.GONE);
-                    tableFragment = new TableFragment();
-                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.attendeesfragment, tableFragment); // Replace R.id.fragmentContainer with the ID of your fragment container
-                    transaction.commit();
-                    Signable = false;
-                }
-
-
-
-
-                viewEventBinding.addparticipant.setVisibility(View.GONE);
-                if(event_List.get(Selected_Event).getAttendee() != null && json.get("Signable") != null)
-                {
-                }
-                wb.ByteMessage.observe(this,a->{
-                    ByteBuffer bytes =  wb.ByteMessage.getValue();
-                    String jsons = new String(Objects.requireNonNull(bytes).array(), bytes.position(), bytes.remaining());
-
-                    // Deserialize the JSON string to your object
-                    Gson gson = new Gson();
-                    Message myObject = gson.fromJson(jsons, Message.class);
-                    System.out.println(jsons);
-                    tableFragment.changeColumnImage(tableFragment.owner_index,myObject.getSignature());
-                });
             }
         });
+        wb.ByteMessage.observe(this,a->{
+            ByteBuffer bytes =  wb.ByteMessage.getValue();
+            String jsons = new String(Objects.requireNonNull(bytes).array(), bytes.position(), bytes.remaining());
 
+            // Deserialize the JSON string to your object
+            Gson gson = new Gson();
+            Message myObject = gson.fromJson(jsons, Message.class);
+            System.out.println(jsons);
+            int pos = -8;
+            for (int i = 0; i < MainActivity.cmeet_event_list.get(ClickedItem).getAttendee().length; i++)
+            {
+                if(myObject.getSender().equals(MainActivity.cmeet_event_list.get(ClickedItem).getAttendee()[i]))
+                {
+                    pos  = i;
+                }
+            }
+            tableFragment.changeColumnImage(pos,myObject.getSignature());
+        });
 
 
         setContentView(viewEventBinding.getRoot());
