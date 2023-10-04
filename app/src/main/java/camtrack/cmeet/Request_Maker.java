@@ -154,7 +154,7 @@ public class Request_Maker
             }
 
             @Override
-            public void onFailure(@NonNull Call<Void> call, Throwable t) {
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                 delaydialog.cancel();
                 signature_dial.cancel();
                 Toast.makeText(con,"Check Your Connection",Toast.LENGTH_LONG).show();

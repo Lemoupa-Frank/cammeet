@@ -140,13 +140,13 @@ public class ViewEvent extends AppCompatActivity {
         });
 
 
-        viewEventBinding.sign.setOnClickListener(f->{
+        /*viewEventBinding.sign.setOnClickListener(f->{
             viewEventBinding.addparticipant.setVisibility(View.GONE);
             tableFragment = new TableFragment();
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.attendeesfragment, tableFragment); // Replace R.id.fragmentContainer with the ID of your fragment container
             transaction.commit();
-        });
+        });*/
 
         observer_signature = s ->
         {
@@ -161,7 +161,6 @@ public class ViewEvent extends AppCompatActivity {
                 signature_dial.findViewById(R.id.sign_event).setOnClickListener(view ->
                 {
                     Bitmap BitSignature = ss.getSignatureBitmap();
-                    startSign.setSignature(BitSignature);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     BitSignature.compress(Bitmap.CompressFormat.JPEG, 50, stream); // Adjust the quality value as needed
                     byte[] byteArray = stream.toByteArray();
@@ -172,6 +171,7 @@ public class ViewEvent extends AppCompatActivity {
                     UMPK.setUserId(user.getUserId());
                     userInmeet.setUserMeetingsPK(UMPK);
                     userInmeet.setSignature_data(byteArray);
+                    startSign.setSignature(byteArray);
                     userInmeet.setSignature(":cmeetSignatures" + UMPK.getUserId());
                     Retrofit retrofit = Retrofit_Base_Class.getClient();
                     Request_Maker request_maker = new Request_Maker();

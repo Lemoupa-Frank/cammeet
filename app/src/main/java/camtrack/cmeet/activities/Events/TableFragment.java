@@ -123,15 +123,15 @@ public class TableFragment extends Fragment {
         }
     }
 
-    public void changeColumnImage(int rowIndex,Bitmap bitmap)
+    public void changeColumnImage(int rowIndex,byte[] bitmap)
     {
         row = (TableRow) tableLayout.getChildAt(rowIndex + 1); // Get the desired row
         //Bitmap sbitmap = resizeBitmap(bitmap,75,75);
         if (row != null) {
-            bitmap.setPremultiplied(true);
+            //bitmap.setPremultiplied(true);
             View columnView = row.getChildAt(2); // Get the desired column view
             ImageView columnImageView = (ImageView) columnView; // Cast the column view to ImageView
-            columnImageView.setImageBitmap(bitmap);
+            columnImageView.setImageBitmap(BitmapFactory.decodeByteArray(bitmap, 0, bitmap.length));
         }
         else
         {

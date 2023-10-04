@@ -8,14 +8,14 @@ public class Message {
     private String sender;
     private String MeetingId;
     private String Name;
-    private Bitmap Signature;
+    private byte[] Signature;
     private Boolean Signable;
 
-    public Bitmap getSignature() {
+    public byte[] getSignature() {
         return Signature;
     }
 
-    public void setSignature(Bitmap signature) {
+    public void setSignature(byte[] signature) {
         Signature = signature;
     }
 
