@@ -114,10 +114,10 @@ public class MainActivity extends AppCompatActivity {
         SignIn_Handler();
 
         // Retrieving user stored in the cache each time this activity is created
-        {
+
             sharedPreferences= getSharedPreferences("User", Context.MODE_PRIVATE);
             user =  cache_a_user(null,user,sharedPreferences);
-        }
+
 
 
         //Initializing variables
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         async();
-
+       // activityMainBinding.greetings.setText("Welcome "+user.getDisplayName());
         setContentView(activityMainBinding.getRoot());
         activityMainBinding.bt2.setOnClickListener(v -> async());
         activityMainBinding.button.setOnClickListener(v ->
@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
         Calendar service = new Calendar.Builder(transport, jsonFactory, googleAccountCredential)
                 .setApplicationName("cammeet")
                 .build();
-            DateTime begin;
+            DateTime begin; 
 //DateTime.parseRfc3339("2023-05-09T13:40:09.000Z")
         try {
             events = service.events().list("primary")
@@ -416,3 +416,5 @@ public class MainActivity extends AppCompatActivity {
 // Here what you rather do is get events for that day from cmeet db which where inserted from cmeet_eveent_list only if there
 // there were new, the events getten from cmeet db are returned and that is what is displayed in the fragment
 // this will imply you need to assert events from then to the end of that day after and ony after all events have been inserted
+// at line 161 uncomment activityMainBinding.greetings.setText("Welcome "+user.getDisplayName());
+// -> turn to your left, walk yellow building on your left on the second floor left apartment when you are facing building

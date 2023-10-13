@@ -83,7 +83,7 @@ public class ViewEvent extends AppCompatActivity {
         if(check_owner(user.getUserId(),a.get(Selected_Event).getOrganizer().getEmail())) {viewEventBinding.edit.setVisibility(View.VISIBLE);}
         try
         {
-            serverUri = new URI("ws://192.168.43.108:8085");
+            serverUri = new URI("ws://192.168.43.107:8085");
         } catch (URISyntaxException e)
         {
             e.printStackTrace();
@@ -300,12 +300,7 @@ public class ViewEvent extends AppCompatActivity {
             edittext.setVisibility(View.INVISIBLE);
         }
     }
-    public Bitmap resizeBitmap(Bitmap originalBitmap, int desiredDpWidth, int desiredDpHeight) {
-        int desiredPxWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, desiredDpWidth, getResources().getDisplayMetrics());
-        int desiredPxHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, desiredDpHeight, getResources().getDisplayMetrics());
 
-        return Bitmap.createScaledBitmap(originalBitmap, desiredPxWidth, desiredPxHeight, true);
-    }
 }
 //remember to setVisibility of sign to Invisible
 
