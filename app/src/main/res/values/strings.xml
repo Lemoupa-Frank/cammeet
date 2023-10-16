@@ -38,6 +38,7 @@
     <string name="authorise_siging">Athorise Signing</string>
     <string name="end_signing">Stop Signing</string>
     <string name="sign">sign Event</string>
+    <string name="no_events">No events Were Found</string>
     <string-array name="Departments">
         <item>Informatique</item>
         <item>Service Après-vente</item>

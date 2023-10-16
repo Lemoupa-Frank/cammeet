@@ -25,4 +25,14 @@
         <item name="fullscreenBackgroundColor">@color/light_blue_600</item>
         <item name="fullscreenTextColor">@color/light_blue_A200</item>
     </style>
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+
+        <item name="windowSplashScreenBackground">@android:color/white</item>
+
+        <item name="windowSplashScreenAnimatedIcon">@drawable/insert_splash</item>
+
+        <item name="postSplashScreenTheme">@style/Theme.Cammeet</item>
+
+
+    </style>
 </resources>

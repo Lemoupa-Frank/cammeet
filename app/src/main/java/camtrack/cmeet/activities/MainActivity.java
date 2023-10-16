@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +27,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
 
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -53,6 +55,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import camtrack.cmeet.R;
 import camtrack.cmeet.R.id;
 import camtrack.cmeet.R.layout;
 import camtrack.cmeet.Request_Maker;
@@ -91,11 +94,11 @@ public class MainActivity extends AppCompatActivity {
     public static List<event_model> get_cmeet_event_list() {
         return cmeet_event_list;
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
         items_listener = new MutableLiveData<>();
         cmeet_item_listener = new MutableLiveData<>();
         account = GoogleSignIn.getLastSignedInAccount(this);
@@ -110,7 +113,6 @@ public class MainActivity extends AppCompatActivity {
         // Ensure we start with no account selected
         googleAccountCredential.setSelectedAccountName(null);
         // Resposibles of starting the authorieation flow to get token
-
         SignIn_Handler();
 
         // Retrieving user stored in the cache each time this activity is created
@@ -132,9 +134,10 @@ public class MainActivity extends AppCompatActivity {
 
         items_listener.observe(this, events -> {
             {
+                activityMainBinding.MainActivityFrag.stopShimmer();
+                activityMainBinding.MainActivityFrag.hideShimmer();
                 if(events != null)
                 {
-
                         retrofitobj = Retrofit_Base_Class.getClient();
                         Request_Maker request_maker = new Request_Maker();
                         cmeet_event_list = cmeet_from_googleEvent(items);
@@ -158,9 +161,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         async();
-       // activityMainBinding.greetings.setText("Welcome "+user.getDisplayName());
+       activityMainBinding.greetings.setText("Welcome "+user.getDisplayName());
         setContentView(activityMainBinding.getRoot());
-        activityMainBinding.bt2.setOnClickListener(v -> async());
+        activityMainBinding.bt2.setOnClickListener(v ->
+                {
+                    activityMainBinding.MainActivityFrag.startShimmer();
+                    activityMainBinding.MainActivityFrag.showShimmer(true);
+                    async();
+                });
         activityMainBinding.button.setOnClickListener(v ->
         {
             Dialog event_dial;
@@ -262,8 +270,14 @@ public class MainActivity extends AppCompatActivity {
         return items;
     }
 
+    private void getEvents_From_CmeetDB()
+    {
+
+    }
+
     /**
      * A function that maes an asynchronous call to get events
+     * from using google Api
      * the function sets a progressbar before creating the
      * new thread
      */
@@ -275,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
             items_listener.postValue(items);
             if (items == null)
             {
-                activityMainBinding.getRoot().post(() -> Toast.makeText(MainActivity.this, "Unable to Load events", Toast.LENGTH_LONG).show());
+                activityMainBinding.getRoot().post(() -> Toast.makeText(MainActivity.this, getResources().getString(camtrack.cmeet.R.string.no_events), Toast.LENGTH_LONG).show());
             }
         }).start();
     }
@@ -385,7 +399,6 @@ public class MainActivity extends AppCompatActivity {
             LEM.add(cm);
         }
         cmeet_event_list = LEM;
-        //Toast.makeText(this,cmeet_event_list.get(0).getDateofcreation(),Toast.LENGTH_LONG).show();
         return LEM;
     }
     public static String[] getAttendees(List<EventAttendee> attendeesList)

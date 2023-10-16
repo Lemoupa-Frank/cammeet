@@ -25,6 +25,7 @@
             android:name=".activities.Events.ViewEvent"
             android:exported="false" />
         <activity
+            android:theme="@style/Theme.App.Starting"
             android:name=".activities.create_account.Signup"
             android:exported="true">
             <intent-filter>

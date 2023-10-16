@@ -38,5 +38,6 @@
     <string name="authorise_siging">Autoriser les signature</string>
     <string name="end_signing">Arreter Les signature</string>
     <string name="sign">signé</string>
+    <string name="no_events">Aucun événement trouvé</string>
 
 </resources>
