@@ -1,7 +1,6 @@
 package camtrack.cmeet.activities;
 
 
-import static android.os.Build.VERSION_CODES.R;
 import static camtrack.cmeet.activities.DatePickerFragment.enddate;
 import static camtrack.cmeet.activities.DatePickerFragment.enddatetemp;
 import static camtrack.cmeet.activities.DatePickerFragment.startdate;
@@ -18,16 +17,21 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 
-import com.facebook.shimmer.ShimmerFrameLayout;
+
+import camtrack.cmeet.R.id;
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -55,8 +59,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import camtrack.cmeet.R;
-import camtrack.cmeet.R.id;
 import camtrack.cmeet.R.layout;
 import camtrack.cmeet.Request_Maker;
 import camtrack.cmeet.activities.Events.MainActivityEventFragment;
@@ -68,48 +70,61 @@ import camtrack.cmeet.retrofit.Request_Route;
 import camtrack.cmeet.retrofit.Retrofit_Base_Class;
 import retrofit2.Retrofit;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Fragment {
     private static final int RC_SIGN_IN = 9001;
     //Load previous events from cache data or store some default event
-    public static List<event_model> cmeet_event_list; public static List<Event> items = null;
+    public static List<event_model> cmeet_event_list;
+    public static List<Event> items = null;
+    public List<Event> previous_items = null;
+
     MutableLiveData<List<Event>> items_listener;
 
     MutableLiveData<List<event_model>> cmeet_item_listener;
-    Request_Route request_route_instqnce; Retrofit retrofitobj;
+    MainActivityEventFragment mainActivityEventFragment;
+    Retrofit retrofitobj;
     public DialogBinding dialogBinding;
     public TextView starttext, endtext;
     ActivityMainBinding activityMainBinding;
     GoogleSignInAccount account;
     SharedPreferences sharedPreferences;
-    public static  String userid;
+    public static String userid;
     Dialog dialog, delaydialog;
     Events events;
     private GoogleSignInClient googleSignInClient;
-    private  GoogleAccountCredential googleAccountCredential;
+    private GoogleAccountCredential googleAccountCredential;
     public static User user;
     public static String user_name;
+    Intent intent;
+
     public static List<Event> items() {
         return items;
     }
+
     public static List<event_model> get_cmeet_event_list() {
         return cmeet_event_list;
     }
 
+    public MainActivity() {
+
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activityMainBinding = ActivityMainBinding.inflate(inflater, container, false);
+        View view = activityMainBinding.getRoot();
         items_listener = new MutableLiveData<>();
         cmeet_item_listener = new MutableLiveData<>();
-        account = GoogleSignIn.getLastSignedInAccount(this);
+        account = GoogleSignIn.getLastSignedInAccount(requireContext());
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestScopes(new Scope(CalendarScopes.CALENDAR_READONLY))
                 .requestIdToken("127612518635-gq1ckmkdplnb4c3tqtrp40nch0epp1n2.apps.googleusercontent.com")
                 .build();
-        googleSignInClient = GoogleSignIn.getClient(this, gso);
+        googleSignInClient = GoogleSignIn.getClient(requireContext(), gso);
         // Create a GoogleAccountCredential using the GoogleSignInAccount
-        googleAccountCredential = GoogleAccountCredential.usingOAuth2(this, Collections.singleton(CalendarScopes.CALENDAR_READONLY));
+        googleAccountCredential = GoogleAccountCredential.usingOAuth2(getContext(), Collections.singleton(CalendarScopes.CALENDAR_READONLY));
         // Ensure we start with no account selected
         googleAccountCredential.setSelectedAccountName(null);
         // Resposibles of starting the authorieation flow to get token
@@ -117,80 +132,87 @@ public class MainActivity extends AppCompatActivity {
 
         // Retrieving user stored in the cache each time this activity is created
 
-            sharedPreferences= getSharedPreferences("User", Context.MODE_PRIVATE);
-            user =  cache_a_user(null,user,sharedPreferences);
-
-
-
+        sharedPreferences = requireContext().getSharedPreferences("User", Context.MODE_PRIVATE);
+        user = cache_a_user(null, user, sharedPreferences);
         //Initializing variables
 
-            dialog = new Dialog(this);
-            activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
-            dialogBinding = DialogBinding.inflate(getLayoutInflater());
-            delaydialog = cmeet_delay.delaydialogCircular(this);
+        dialog = new Dialog(getContext());
+        dialogBinding = DialogBinding.inflate(getLayoutInflater());
+        delaydialog = cmeet_delay.delaydialogCircular(getContext());
 
 
-
-
-        items_listener.observe(this, events -> {
+        items_listener.observe(getViewLifecycleOwner(), event -> {
             {
                 activityMainBinding.MainActivityFrag.stopShimmer();
                 activityMainBinding.MainActivityFrag.hideShimmer();
-                if(events != null)
-                {
-                        retrofitobj = Retrofit_Base_Class.getClient();
-                        Request_Maker request_maker = new Request_Maker();
-                        cmeet_event_list = cmeet_from_googleEvent(items);
-                        request_maker.store_todays_meets(retrofitobj,MainActivity.this,cmeet_event_list, cmeet_item_listener);
-                        MainActivityEventFragment fragment = new MainActivityEventFragment();
-                            getSupportFragmentManager()
+                if (items != null) {
+                    retrofitobj = Retrofit_Base_Class.getClient();
+                    Request_Maker request_maker = new Request_Maker();
+                    cmeet_event_list = cmeet_from_googleEvent(items);
+                    if (!items.equals(previous_items)) {
+                        request_maker.store_todays_meets(retrofitobj, getContext(), cmeet_event_list, cmeet_item_listener);
+                    }
+                    previous_items = items;
+                    mainActivityEventFragment = new MainActivityEventFragment();
+                    getChildFragmentManager()
                             .beginTransaction()
-                            .replace(id.MainActivityFrag, fragment)
+                            .replace(id.MainActivityFrag, mainActivityEventFragment)
                             .commit();
                 }
             }
         });
 
-        cmeet_item_listener.observe(MainActivity.this,cmeet_events->
+        cmeet_item_listener.observe(getViewLifecycleOwner(), cmeet_events ->
         {
-            MainActivityEventFragment fragment = new MainActivityEventFragment();
-            getSupportFragmentManager()
+            mainActivityEventFragment = new MainActivityEventFragment();
+            getChildFragmentManager()
                     .beginTransaction()
-                    .replace(id.MainActivityFrag, fragment)
+                    .replace(id.MainActivityFrag, mainActivityEventFragment)
                     .commit();
         });
 
-        async();
-       activityMainBinding.greetings.setText("Welcome "+user.getDisplayName());
-        setContentView(activityMainBinding.getRoot());
+        activityMainBinding.greetings.setText("Welcome " + user.getDisplayName());
         activityMainBinding.bt2.setOnClickListener(v ->
-                {
-                    activityMainBinding.MainActivityFrag.startShimmer();
-                    activityMainBinding.MainActivityFrag.showShimmer(true);
-                    async();
-                });
-        activityMainBinding.button.setOnClickListener(v ->
+        {
+            activityMainBinding.MainActivityFrag.startShimmer();
+            activityMainBinding.MainActivityFrag.showShimmer(true);
+            async();
+        });
+
+        activityMainBinding.calendar.setOnClickListener(v ->
         {
             Dialog event_dial;
             event_dial = openDialog();
-            if (items != null)
-            {
-                MainActivityEventFragment fragment = new MainActivityEventFragment();
-                getSupportFragmentManager().beginTransaction()
-                        .replace(id.MainActivityFrag, fragment)
+            if (items != null) {
+                mainActivityEventFragment = new MainActivityEventFragment();
+                getChildFragmentManager().beginTransaction()
+                        .replace(id.MainActivityFrag, mainActivityEventFragment)
                         .commit();
             }
             event_dial.show();
         });
 
+        activityMainBinding.home.setOnClickListener(v ->
+        {
+            if(getChildFragmentManager().getFragments().size() > 1){
+            getChildFragmentManager().beginTransaction()
+                    .remove(mainActivityEventFragment)
+                    .commit();}
+        });
 
-
-
+        activityMainBinding.matrix.setOnClickListener(v ->
+        {
+            mainActivityEventFragment = new MainActivityEventFragment();
+            getChildFragmentManager().beginTransaction()
+                    .replace(id.MainActivityFrame, mainActivityEventFragment)
+                    .commit();
+        });
+        return view;
     }
 
     // Handles the result of the google signactivity started by signin()
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -198,17 +220,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult();
             if (account != null) {
                 googleAccountCredential.setSelectedAccount(account.getAccount());
                 user_name = account.getEmail();
+                Toast.makeText(requireContext(), "async() called", Toast.LENGTH_SHORT).show();
+                async();
             }
         } catch (Exception e) {
             Log.d("MainActivity", "handleSignInResult: " + e.getMessage());
             System.out.println("**************Line 192 Mainactivity" + e);
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -224,11 +249,11 @@ public class MainActivity extends AppCompatActivity {
         Calendar service = new Calendar.Builder(transport, jsonFactory, googleAccountCredential)
                 .setApplicationName("cammeet")
                 .build();
-            DateTime begin; 
+        DateTime begin;
 //DateTime.parseRfc3339("2023-05-09T13:40:09.000Z")
         try {
             events = service.events().list("primary")
-                    .setMaxResults(100)
+                    .setMaxResults(50)
                     .setTimeMin(Start)
                     .setTimeMax(end)
                     .setOrderBy("startTime")
@@ -260,18 +285,15 @@ public class MainActivity extends AppCompatActivity {
             // Handle user-authorization errors
             startActivityForResult(e.getIntent(), RC_SIGN_IN);
             System.out.println("***************UserRecoverableAuthIOException ***************  line 244" + e);
-            Toast.makeText(MainActivity.this, "There was a problem with the authentication", Toast.LENGTH_LONG).show();
         } // Handle authorization errors
         catch (IOException e) {
             // Handle Google API errors
-            Toast.makeText(MainActivity.this,"An Exception Occured", Toast.LENGTH_LONG).show();
             System.out.println("*****************IOException************* line 250 " + e);
         }// Handle other I/O errors
         return items;
     }
 
-    private void getEvents_From_CmeetDB()
-    {
+    private void getEvents_From_CmeetDB() {
 
     }
 
@@ -281,31 +303,39 @@ public class MainActivity extends AppCompatActivity {
      * the function sets a progressbar before creating the
      * new thread
      */
-    public void async()
-    {
+    public void async() {
         new Thread(() ->
         {
             items = getEventsForDay(startdate, enddate);
             items_listener.postValue(items);
-            if (items == null)
-            {
-                activityMainBinding.getRoot().post(() -> Toast.makeText(MainActivity.this, getResources().getString(camtrack.cmeet.R.string.no_events), Toast.LENGTH_LONG).show());
+            if (items == null) {
+                activityMainBinding.getRoot().post(() -> Toast.makeText(getContext(), getResources().getString(camtrack.cmeet.R.string.no_events), Toast.LENGTH_LONG).show());
             }
+            activityMainBinding.MainActivityFrag.post(() -> activityMainBinding.MainActivityFrag.stopShimmer());
+            activityMainBinding.MainActivityFrag.post(() -> activityMainBinding.MainActivityFrag.hideShimmer());
         }).start();
     }
 
     /**
      * Check if there is a google account signed in if there  is none
-     * it starts a signin flow
+     * it starts a signin flow by calling Sign() which in returns
+     * starts the task to sign in by using handleSignInResult and onActivityResult
+     * thus async can only be called once in the sign in flow i.e if
+     * there is a user just call async else sign the user in
+     * and then call async
      */
     public void SignIn_Handler() {
         if (account != null) {
             // User is already signed in, use the account to set up the GoogleAccountCredential
             googleAccountCredential.setSelectedAccount(account.getAccount());
+            Toast.makeText(requireContext(), "async() called", Toast.LENGTH_SHORT).show();
+            async();
+            /*if(items == null)
+            {async();}*/
             userid = account.getEmail();
         } else {
             // User is not signed in, start the sign-in flow
-            Toast.makeText(this, "No User signed in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "No User signed in", Toast.LENGTH_SHORT).show();
             signIn();
 
         }
@@ -321,7 +351,7 @@ public class MainActivity extends AppCompatActivity {
 
     public Dialog openDialog() {
         dialog.setContentView(layout.dialog);
-        Display display = getWindowManager().getDefaultDisplay();
+        Display display = requireActivity().getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         int width = size.x;
@@ -329,96 +359,109 @@ public class MainActivity extends AppCompatActivity {
         Objects.requireNonNull(dialog.getWindow()).setLayout(5 * (width) / 7, 5 * (height) / 7);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.setCanceledOnTouchOutside(false);
+        Button startdate = dialog.findViewById(id.buttonstartdate);
+        Button enddate = dialog.findViewById(id.buttonenddate);
+        Button cancel = dialog.findViewById(id.cancel);
+        Button validate = dialog.findViewById(id.valid);
+
+        startdate.setOnClickListener(v -> {
+            StartDatePickerDialog();
+        });
+        enddate.setOnClickListener(v -> {
+            EndDatePickerDialog();
+        });
+        cancel.setOnClickListener(v -> {
+            dialog_canel();
+        });
+        validate.setOnClickListener(v -> {
+            dialog_validate();
+        });
+
+
         return dialog;
     }
 
-    public void StartDatePickerDialog(View view) {
+    public void StartDatePickerDialog() {
+        Toast.makeText(getContext(), "STart date", Toast.LENGTH_LONG).show();
         DatePickerFragment newFragment = new DatePickerFragment();
         starttext = dialog.findViewById(id.textstartdate);
         newFragment.setListener((year, month, dayOfMonth) -> {
-            LocalDateTime dateTimes = LocalDateTime.of(year, month, dayOfMonth,0,0,0,0);
+            LocalDateTime dateTimes = LocalDateTime.of(year, month, dayOfMonth, 0, 0, 0, 0);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             String formattedDate = dateTimes.format(formatter);
             startdatetemp = DateTime.parseRfc3339(formattedDate);
             starttext.setText(startdatetemp.toString());
         });
-        newFragment.show(getSupportFragmentManager(), "StartDate");
+        newFragment.show(getChildFragmentManager(), "StartDate");
     }
 
-    public void EndDatePickerDialog(View view) {
+    public void EndDatePickerDialog() {
         DatePickerFragment newFragment = new DatePickerFragment();
         endtext = dialog.findViewById(id.textendtdate);
         newFragment.setListener((year, month, dayOfMonth) -> {
 
-            LocalDateTime dateTimes = LocalDateTime.of(year, month, dayOfMonth,0,0,0,0);
+            LocalDateTime dateTimes = LocalDateTime.of(year, month, dayOfMonth, 0, 0, 0, 0);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             String formattedDate = dateTimes.format(formatter);
             enddatetemp = DateTime.parseRfc3339(formattedDate);
             endtext.setText(enddatetemp.toString());
         });
-        newFragment.show(getSupportFragmentManager(), "EndDate");
+        newFragment.show(getChildFragmentManager(), "EndDate");
     }
 
-    public void dialog_canel(View view)
-    {
+    public void dialog_canel() {
         dialog.cancel();
     }
-    public void dialog_validate(View view)
-    {
-        if(startdatetemp != null && enddatetemp != null)
-        {
+
+    public void dialog_validate() {
+        if (startdatetemp != null && enddatetemp != null) {
             startdate = startdatetemp;
             enddate = enddatetemp;
             dialog.cancel();
-        }
-        else
-        {
-            Toast.makeText(this, googleAccountCredential.getSelectedAccountName() + " signed in", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), "No change", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public List<event_model> cmeet_from_googleEvent(List<Event> myevent)
-    {
+    public List<event_model> cmeet_from_googleEvent(List<Event> myevent) {
 
         List<event_model> LEM = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-        for (Event ev : myevent)
-        {
+        for (Event ev : myevent) {
             event_model cm = new event_model();
             cm.setMeetingId(ev.getId());
             cm.setLocation(ev.getLocation());
-            cm.setNumberOfParticipants(ev.getAttendees()==null?0:ev.getAttendees().size());
-            cm.setOwner(ev.getOrganizer().getEmail()==null?ev.getCreator().getId():ev.getOrganizer().getEmail());
+            cm.setNumberOfParticipants(ev.getAttendees() == null ? 0 : ev.getAttendees().size());
+            cm.setOwner(ev.getOrganizer().getEmail() == null ? ev.getCreator().getId() : ev.getOrganizer().getEmail());
             cm.setDateofcreation(ev.getCreated().toString());
-            cm.setStartdate(ev.getStart().getDateTime() == null?null:ev.getStart().getDateTime().toString());
-            cm.setEnddate(ev.getEnd().getDateTime() == null?null:ev.getEnd().getDateTime().toString());
-            cm.setDescription(ev.getDescription()==null?"none":ev.getDescription());
-            cm.setTitle(ev.getSummary()==null?"none":ev.getSummary());
+            cm.setStartdate(ev.getStart().getDateTime() == null ? null : ev.getStart().getDateTime().toString());
+            cm.setEnddate(ev.getEnd().getDateTime() == null ? null : ev.getEnd().getDateTime().toString());
+            cm.setDescription(ev.getDescription() == null ? "none" : ev.getDescription());
+            cm.setTitle(ev.getSummary() == null ? "none" : ev.getSummary());
             cm.setAttendee(getAttendees(ev.getAttendees()));
-            cm.setuserid(MainActivity.userid==null?user.getUserId():MainActivity.userid);
+            cm.setuserid(MainActivity.userid == null ? user.getUserId() : MainActivity.userid);
+            cm.setUpdateComment(ev.getOrganizer().getEmail() == null ? ev.getCreator().getId() : ev.getOrganizer().getEmail());
+            cm.setUpdateComment(ev.getCreated().toString());
             LEM.add(cm);
         }
-        cmeet_event_list = LEM;
         return LEM;
     }
-    public static String[] getAttendees(List<EventAttendee> attendeesList)
-    {
+
+    public static String[] getAttendees(List<EventAttendee> attendeesList) {
         ArrayList<String> Attendees = new ArrayList<>();
-        if (attendeesList == null)
-        {
+        if (attendeesList == null) {
             return null;
         }
-        for (EventAttendee attendee : attendeesList)
-        {
+        for (EventAttendee attendee : attendeesList) {
             Attendees.add(attendee.getEmail());
         }
         return Attendees.toArray(new String[0]);
     }
 
-    public static User getuser()
-    {
+    public static User getuser() {
         return user;
     }
+
 }
 
 // do a call to the cmeet database if you ecounter an exception in getEvents

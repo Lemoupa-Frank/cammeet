@@ -18,7 +18,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:onClick="StartDatePickerDialog"
             android:text="@string/starting_from"
             android:textAlignment="center"
             android:textSize="19sp" />
@@ -36,7 +35,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:onClick="EndDatePickerDialog"
             android:text="@string/end_time"
             android:textAlignment="center"
             android:textSize="19sp" />

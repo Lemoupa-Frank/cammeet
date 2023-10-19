@@ -28,6 +28,10 @@ public class event_model  implements Serializable{
 
     private String userid;
 
+    private String meeting_update_time;
+
+    private String update_comment;
+
     private String[] attendee;
     //MOve this datatype to an ArrayList maybe
 
@@ -114,6 +118,22 @@ public class event_model  implements Serializable{
 
     public String[] getAttendee() {
         return attendee;
+    }
+
+    public String getMeetingupdateTime() {
+        return meeting_update_time;
+    }
+
+    public void setMeetingupdateTime(String meetingupdateTime) {
+        this.meeting_update_time = meetingupdateTime;
+    }
+
+    public String getUpdateComment() {
+        return update_comment;
+    }
+
+    public void setUpdateComment(String updateComment) {
+        this.update_comment = updateComment;
     }
 
     public void setAttendee(String[] attendee) {

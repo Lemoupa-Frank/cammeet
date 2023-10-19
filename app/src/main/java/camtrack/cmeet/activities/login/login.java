@@ -20,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import camtrack.cmeet.R;
+import camtrack.cmeet.activities.Home;
 import camtrack.cmeet.activities.MainActivity;
 import camtrack.cmeet.activities.cmeet_delay;
 import camtrack.cmeet.activities.create_account.Signup;
@@ -84,7 +85,7 @@ public class login extends AppCompatActivity {
                     delD.cancel();
                     Toast.makeText(login.this, "welcome "+newuser.getDisplayName(), Toast.LENGTH_LONG).show();
                     cache_a_user(editor,newuser,null);
-                    I = new Intent(login.this, MainActivity.class);
+                    I = new Intent(login.this, Home.class);
                     startActivity(I);
                 }
                 else
@@ -98,7 +99,7 @@ public class login extends AppCompatActivity {
             public void onFailure(@NonNull Call<User> call, @NonNull Throwable t)
             {
                 delD.cancel();
-                Toast.makeText(login.this, R.string.Server_down, Toast.LENGTH_LONG).show();
+                Toast.makeText(login.this, "Invalid Credentials", Toast.LENGTH_LONG).show();
                 //Set t to differentiate when server is not reachable and false login and timeout
             }
         });

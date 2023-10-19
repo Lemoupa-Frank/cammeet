@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.jar.Attributes;
 
 import camtrack.cmeet.R;
 import camtrack.cmeet.activities.MainActivity;

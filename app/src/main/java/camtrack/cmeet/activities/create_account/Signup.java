@@ -62,6 +62,7 @@ public class Signup extends AppCompatActivity {
             {
                 newuser = new User(signupbinding.Email.getText().toString(),signupbinding.username.getText().toString(),signupbinding.phone.getText().toString(),signupbinding.department.getSelectedItem().toString());
                 newuser.set_password(signupbinding.password.getText().toString());
+                newuser.setRole("MEMBER");
                 Creat_User(request_route,retrofitobj);
             }
             else

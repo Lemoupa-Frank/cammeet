@@ -19,15 +19,18 @@
         android:theme="@style/Theme.Cammeet"
         tools:targetApi="31">
         <activity
+            android:name=".activities.Home"
+            android:exported="true" />
+        <activity
             android:name=".activities.Events.EditEvent"
             android:exported="false" />
         <activity
             android:name=".activities.Events.ViewEvent"
             android:exported="false" />
         <activity
-            android:theme="@style/Theme.App.Starting"
             android:name=".activities.create_account.Signup"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.App.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
