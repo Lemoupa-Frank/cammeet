@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?><!--  res/layout/verify_num.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:background="@drawable/rounded_square"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:padding="3dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/department_name"
+            android:layout_width="200dp"
+            android:layout_height="30dp"
+            android:hint="User Email"
+            android:gravity="start"
+            android:layout_margin="10dp"
+            android:textColor="@color/black_white"
+            android:backgroundTint="@color/icon_color"
+            android:background="@drawable/attendee_recycler_background"
+            android:textSize="20sp" />
+        <Spinner
+            android:id="@+id/department_role"
+            android:layout_width="200dp"
+            android:layout_height="30dp"
+            android:gravity="center"
+            android:layout_margin="10dp"
+            android:backgroundTint="@color/icon_color"
+            android:background="@drawable/attendee_recycler_background"
+            app:layout_constraintBottom_toBottomOf="@id/signup"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/password"
+            app:layout_constraintVertical_bias="0.332" />
+        <EditText
+            android:id="@+id/department_passworw"
+            android:layout_width="200dp"
+            android:layout_height="30dp"
+            android:layout_margin="10dp"
+            android:hint="@string/prompt_password"
+            android:gravity="start"
+            android:padding="5dp"
+            android:textColor="@color/black"
+            android:backgroundTint="@color/icon_color"
+            android:background="@drawable/attendee_recycler_background"
+            android:textSize="20sp" />
+
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/valid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="@string/validate"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/cancel"
+            app:layout_constraintHorizontal_bias="0.146"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.925"
+            tools:ignore="ButtonStyle" />
+
+        <Button
+            android:id="@+id/cancel"
+            android:elevation="8dp"
+            android:translationZ="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="@string/cancel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.925"
+            tools:ignore="ButtonStyle" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

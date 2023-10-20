@@ -42,6 +42,15 @@
     <string-array name="Departments">
         <item>Informatique</item>
         <item>Service Après-vente</item>
+        <item>Technique</item>
+        <item>Comercial</item>
+        <item>Recherche Et Development</item>
+        <item>Contable</item>
+        <item>Resources Humains</item>
+    </string-array>
+    <string-array name="Department_Role">
+        <item>Director</item>
+        <item>Head of a Service</item>
     </string-array>
 
 </resources>

@@ -61,6 +61,7 @@ import java.util.Objects;
 
 import camtrack.cmeet.R.layout;
 import camtrack.cmeet.Request_Maker;
+import camtrack.cmeet.RoleFragment;
 import camtrack.cmeet.activities.Events.MainActivityEventFragment;
 import camtrack.cmeet.activities.Events.event_model;
 import camtrack.cmeet.activities.login.model.User;
@@ -81,6 +82,7 @@ public class MainActivity extends Fragment {
 
     MutableLiveData<List<event_model>> cmeet_item_listener;
     MainActivityEventFragment mainActivityEventFragment;
+    RoleFragment roleFragment;
     Retrofit retrofitobj;
     public DialogBinding dialogBinding;
     public TextView starttext, endtext;
@@ -196,15 +198,16 @@ public class MainActivity extends Fragment {
         {
             if(getChildFragmentManager().getFragments().size() > 1){
             getChildFragmentManager().beginTransaction()
-                    .remove(mainActivityEventFragment)
+                    .remove(roleFragment)
                     .commit();}
         });
 
         activityMainBinding.matrix.setOnClickListener(v ->
         {
-            mainActivityEventFragment = new MainActivityEventFragment();
+            roleFragment = new RoleFragment();
+            //mainActivityEventFragment = new MainActivityEventFragment();
             getChildFragmentManager().beginTransaction()
-                    .replace(id.MainActivityFrame, mainActivityEventFragment)
+                    .replace(id.MainActivityFrame, roleFragment)
                     .commit();
         });
         return view;
