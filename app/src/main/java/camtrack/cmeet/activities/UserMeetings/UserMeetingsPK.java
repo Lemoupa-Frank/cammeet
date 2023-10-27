@@ -2,7 +2,9 @@ package camtrack.cmeet.activities.UserMeetings;
 
 import androidx.annotation.NonNull;
 
-public class UserMeetingsPK
+import java.io.Serializable;
+
+public class UserMeetingsPK implements Serializable
 {
     private String meetingId;
     private String userId;

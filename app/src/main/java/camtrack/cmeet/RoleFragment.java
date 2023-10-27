@@ -2,35 +2,48 @@ package camtrack.cmeet;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.provider.Settings;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+
+import camtrack.cmeet.activities.MainActivity;
+import camtrack.cmeet.activities.cmeet_delay;
 import camtrack.cmeet.databinding.FragmentRoleBinding;
 
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
-import org.checkerframework.checker.nullness.qual.NonNull;
+import com.google.api.client.json.Json;
 
 import java.util.Objects;
 
 import camtrack.cmeet.placeholder.PlaceholderContent;
+import camtrack.cmeet.retrofit.Request_Route;
+import camtrack.cmeet.retrofit.Retrofit_Base_Class;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 /**
  * A fragment representing a list of Items.
@@ -42,11 +55,13 @@ public class RoleFragment extends Fragment {
     // TODO: Customize parameters
     private int mColumnCount = 1;
 
-    Spinner Department_role_Spinner;
-
     Dialog dialog;
 
     FragmentRoleBinding binding;
+
+    TextView department_role;
+
+    Retrofit retrofit = Retrofit_Base_Class.getClient_String();
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -97,12 +112,15 @@ public class RoleFragment extends Fragment {
             @Override
             public void onItemClick(int position) {
                 dialog  = openDialog();
-                TextView department = dialog.findViewById(R.id.department_name);
+                department_role = dialog.findViewById(R.id.department_name);
+                EditText password = dialog.findViewById(R.id.department_password);
                 Button valid  = dialog.findViewById(R.id.valid);
                 Button cancel  = dialog.findViewById(R.id.cancel);
-                department.setText(myRoleNameRecyclerViewAdapter.getmValues().get(position).content);
+                department_role.setText(myRoleNameRecyclerViewAdapter.getmValues().get(position).content);
                 cancel.setOnClickListener(v->dialog.cancel());
-                valid.setOnClickListener(v->{});
+                valid.setOnClickListener(v->{
+                    update_role(MainActivity.userid, department_role.getText().toString() ,password.getText().toString(),retrofit);
+                });
                 dialog.show();
             }
         });
@@ -113,23 +131,53 @@ public class RoleFragment extends Fragment {
     public Dialog openDialog() {
         dialog = new Dialog(requireContext());
         dialog.setContentView(R.layout.select_role_dialog);
-        Department_role_Spinner = dialog.findViewById(R.id.department_role);
-        set_spinner(Department_role_Spinner, getContext(), R.array.Department_Role);
         Display display = requireActivity().getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         int width = size.x;
         int height = size.y;
-        Objects.requireNonNull(dialog.getWindow()).setLayout((width), 3 * (height) / 7);
+        Objects.requireNonNull(dialog.getWindow()).setLayout((width),  (height) / 7);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.setCanceledOnTouchOutside(false);
         return dialog;
     }
-    public void set_spinner(Spinner spinner, Context context, int array_resource_value)
+
+    public void update_role(String userid, String role, String password, Retrofit retrofitObject)
     {
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context,
-                array_resource_value, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+        Dialog delaydialog = cmeet_delay.delaydialogCircular(getContext());
+        delaydialog.show();
+        Request_Route RR = retrofitObject.create(Request_Route.class);
+        Call<String> CreateUserCall = RR.update_user_role(userid,"Human Resource Head",password);
+        CreateUserCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(@androidx.annotation.NonNull Call<String> call, @androidx.annotation.NonNull Response<String> response) {
+                if(response.isSuccessful())
+                {
+                    delaydialog.cancel();
+                    SharedPreferences sharedPreferences; SharedPreferences.Editor editor;
+                    sharedPreferences = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE);
+                    editor = sharedPreferences.edit();
+                    editor.putString("Role", department_role.getText().toString());
+                    String answer = response.body();
+                    Toast.makeText(getContext(), "success" +  answer, Toast.LENGTH_LONG).show();
+                    editor.apply();
+                    Toast.makeText(getContext(), sharedPreferences.getString("Role",""), Toast.LENGTH_LONG).show();
+                }
+                else {
+                    Toast.makeText(getContext(), "response.code()", Toast.LENGTH_LONG).show();
+                    System.out.println(response);
+                    delaydialog.cancel();
+                }
+            }
+
+            @Override
+            public void onFailure(@androidx.annotation.NonNull Call<String> call, @NonNull Throwable t) {
+                //Toast.makeText(getContext(), R.string.Server_down, Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Failure: " + t, Toast.LENGTH_LONG).show();
+                delaydialog.cancel();
+            }
+        });
     }
+
+
 }

@@ -21,6 +21,7 @@ public class cache_user {
             editor.putString("displayName", user.getDisplayName());
             editor.putString("number", user.getNumber());
             editor.putString("department", user.getDepartment());
+            editor.putString("role",user.getRole());
             editor.apply();
             return user;
         }
@@ -32,6 +33,7 @@ public class cache_user {
                     sh.getString("number","..."),
                     sh.getString("department","...")
             );
+            user.setRole(sh.getString("role","..."));
             return user;
         }
     }

@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@color/darker_layout_background"
     android:layout_height="match_parent"
     tools:context=".activities.Events.ViewEvent">
 
@@ -88,19 +89,31 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start|top"
+                    android:textColor="@color/white_black"
                     android:textSize="18sp"
                     tools:ignore="Autofill,LabelFor,TextFields"
                     />
             </LinearLayout>
-
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="13dp"
+            android:orientation="horizontal"
+            tools:ignore="UseCompoundDrawables">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/location_image_view"
+                android:background="@drawable/ic_baseline_admin_panel_settings_24"/>
             <TextView
                 android:id="@+id/editOwner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="13dp"
-                android:textSize="18sp"
-                app:drawableLeftCompat="@drawable/ic_baseline_admin_panel_settings_24" />
+                android:textColor="@color/white_black"
+                android:layout_gravity="start|top"
+                android:textSize="18sp"/>
+        </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -146,8 +159,29 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start|top"
+                    android:textColor="@color/white_black"
                     android:textSize="18sp"
                     tools:ignore="Autofill,LabelFor,TextFields" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="13dp"
+                android:orientation="horizontal"
+                tools:ignore="UseCompoundDrawables">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/location_image_view"
+                    android:background="@drawable/ic_baseline_assignment_24"/>
+                <TextView
+                    android:id="@+id/meetingid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white_black"
+                    android:layout_gravity="start|top"
+                    android:textSize="18sp"/>
             </LinearLayout>
 
         </LinearLayout>

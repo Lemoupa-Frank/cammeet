@@ -12,11 +12,11 @@
     tools:context=".activities.create_account.Signup">
 
     <ImageView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_margin="10dp"
         android:id="@+id/logo"
-        android:src="@drawable/icon_cm"
+        android:layout_width="138dp"
+        android:layout_height="136dp"
+        android:layout_margin="10dp"
+        android:src="@drawable/newlogocamtrack"
         app:layout_constraintBottom_toTopOf="@id/username"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -94,6 +94,8 @@
         android:layout_marginTop="16dp"
         android:layout_marginBottom="64dp"
         android:text="@string/action_sign_in"
+        android:textColor="#2196F3"
+        android:backgroundTint="@color/darker_layout_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.417"

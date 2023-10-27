@@ -1,6 +1,5 @@
 package camtrack.cmeet.websocket;
 
-import static camtrack.cmeet.activities.Events.EventAdapter.ClickedItem;
 
 import androidx.lifecycle.MutableLiveData;
 
@@ -8,18 +7,22 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import camtrack.cmeet.activities.MainActivity;
+import camtrack.cmeet.activities.Events.event_model;
+
 
 public class webSocketClient extends WebSocketClient {
     public static MutableLiveData<String>  Error =  new MutableLiveData<>();
     public  MutableLiveData<String>  _Message =  new MutableLiveData<>();
     public  MutableLiveData<ByteBuffer>  ByteMessage =  new MutableLiveData<>();
+    public List<event_model> event_modelList;
     public webSocketClient(URI serverUri) {
         super(serverUri);
     }
+    public int ClickedItem;
     private static final int CONNECTION_TIMEOUT = 5000; // Set the timeout value in milliseconds
     private Timer connectionTimer;
 
@@ -51,7 +54,7 @@ public class webSocketClient extends WebSocketClient {
 
     public void connect() {
         System.out.println("***************Connection innitiated******");
-        addHeader("X-UID", MainActivity.get_cmeet_event_list().get(ClickedItem).getMeetingId());
+        addHeader("X-UID", event_modelList.get(ClickedItem).getMeetingId());
         super.connect();
 
     }

@@ -7,6 +7,7 @@ import static camtrack.cmeet.activities.DatePickerFragment.startdate;
 import static camtrack.cmeet.activities.DatePickerFragment.startdatetemp;
 import static camtrack.cmeet.activities.login.data.cache_user.cache_a_user;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -14,13 +15,18 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.StringBuilderPrinter;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,6 +73,7 @@ import camtrack.cmeet.activities.Events.event_model;
 import camtrack.cmeet.activities.login.model.User;
 import camtrack.cmeet.databinding.ActivityMainBinding;
 import camtrack.cmeet.databinding.DialogBinding;
+import camtrack.cmeet.matrices_fragment;
 import camtrack.cmeet.retrofit.Request_Route;
 import camtrack.cmeet.retrofit.Retrofit_Base_Class;
 import retrofit2.Retrofit;
@@ -83,6 +90,8 @@ public class MainActivity extends Fragment {
     MutableLiveData<List<event_model>> cmeet_item_listener;
     MainActivityEventFragment mainActivityEventFragment;
     RoleFragment roleFragment;
+
+    matrices_fragment matricesFragment;
     Retrofit retrofitobj;
     public DialogBinding dialogBinding;
     public TextView starttext, endtext;
@@ -116,6 +125,12 @@ public class MainActivity extends Fragment {
         super.onCreate(savedInstanceState);
         activityMainBinding = ActivityMainBinding.inflate(inflater, container, false);
         View view = activityMainBinding.getRoot();
+        /*FrameLayout backgroundLayout = activityMainBinding.getRoot();;
+        int statusBarColor = ((ColorDrawable) backgroundLayout.getBackground()).getColor();
+        Activity activity = getActivity();
+        Window window = activity.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(statusBarColor);*/
         items_listener = new MutableLiveData<>();
         cmeet_item_listener = new MutableLiveData<>();
         account = GoogleSignIn.getLastSignedInAccount(requireContext());
@@ -129,16 +144,16 @@ public class MainActivity extends Fragment {
         googleAccountCredential = GoogleAccountCredential.usingOAuth2(getContext(), Collections.singleton(CalendarScopes.CALENDAR_READONLY));
         // Ensure we start with no account selected
         googleAccountCredential.setSelectedAccountName(null);
-        // Resposibles of starting the authorieation flow to get token
+        // Responsible FOR starting the authorization flow to get token notice how it is befor the cache_a_user
         SignIn_Handler();
 
         // Retrieving user stored in the cache each time this activity is created
-
         sharedPreferences = requireContext().getSharedPreferences("User", Context.MODE_PRIVATE);
         user = cache_a_user(null, user, sharedPreferences);
-        //Initializing variables
 
-        dialog = new Dialog(getContext());
+        activityMainBinding.circleTextview.setText(user_initials(user.getDisplayName()));
+
+        dialog = new Dialog(requireContext());
         dialogBinding = DialogBinding.inflate(getLayoutInflater());
         delaydialog = cmeet_delay.delaydialogCircular(getContext());
 
@@ -194,22 +209,7 @@ public class MainActivity extends Fragment {
             event_dial.show();
         });
 
-        activityMainBinding.home.setOnClickListener(v ->
-        {
-            if(getChildFragmentManager().getFragments().size() > 1){
-            getChildFragmentManager().beginTransaction()
-                    .remove(roleFragment)
-                    .commit();}
-        });
 
-        activityMainBinding.matrix.setOnClickListener(v ->
-        {
-            roleFragment = new RoleFragment();
-            //mainActivityEventFragment = new MainActivityEventFragment();
-            getChildFragmentManager().beginTransaction()
-                    .replace(id.MainActivityFrame, roleFragment)
-                    .commit();
-        });
         return view;
     }
 
@@ -230,7 +230,6 @@ public class MainActivity extends Fragment {
             if (account != null) {
                 googleAccountCredential.setSelectedAccount(account.getAccount());
                 user_name = account.getEmail();
-                Toast.makeText(requireContext(), "async() called", Toast.LENGTH_SHORT).show();
                 async();
             }
         } catch (Exception e) {
@@ -331,10 +330,7 @@ public class MainActivity extends Fragment {
         if (account != null) {
             // User is already signed in, use the account to set up the GoogleAccountCredential
             googleAccountCredential.setSelectedAccount(account.getAccount());
-            Toast.makeText(requireContext(), "async() called", Toast.LENGTH_SHORT).show();
             async();
-            /*if(items == null)
-            {async();}*/
             userid = account.getEmail();
         } else {
             // User is not signed in, start the sign-in flow
@@ -385,7 +381,6 @@ public class MainActivity extends Fragment {
     }
 
     public void StartDatePickerDialog() {
-        Toast.makeText(getContext(), "STart date", Toast.LENGTH_LONG).show();
         DatePickerFragment newFragment = new DatePickerFragment();
         starttext = dialog.findViewById(id.textstartdate);
         newFragment.setListener((year, month, dayOfMonth) -> {
@@ -429,7 +424,6 @@ public class MainActivity extends Fragment {
     public List<event_model> cmeet_from_googleEvent(List<Event> myevent) {
 
         List<event_model> LEM = new ArrayList<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
         for (Event ev : myevent) {
             event_model cm = new event_model();
             cm.setMeetingId(ev.getId());
@@ -463,6 +457,23 @@ public class MainActivity extends Fragment {
 
     public static User getuser() {
         return user;
+    }
+
+    public String user_initials(String Display_name)
+    {
+        String[] names = Display_name.split(" ");
+
+        StringBuilder initials = new StringBuilder();
+
+        for (int i = 0; i < Math.min(2, names.length); i++) {
+            String name = names[i];
+            if (!name.isEmpty()) {
+                initials.append(name.charAt(0)).append(" "); // Append the first letter and a space
+            }
+        }
+
+        String formattedInitials = initials.toString().trim();
+        return formattedInitials;
     }
 
 }

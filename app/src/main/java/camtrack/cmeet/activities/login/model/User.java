@@ -5,7 +5,6 @@ public class User {
     private final String display_name;
     private final String number;
     private final String department;
-
     private String role;
     private  String password;
 

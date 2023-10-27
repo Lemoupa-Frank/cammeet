@@ -1,6 +1,5 @@
 package camtrack.cmeet.activities.Events;
 
-import static camtrack.cmeet.activities.Events.EventAdapter.ClickedItem;
 
 
 import android.os.Bundle;
@@ -13,23 +12,24 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.api.services.calendar.model.Event;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import camtrack.cmeet.R;
-import camtrack.cmeet.activities.MainActivity;
+import camtrack.cmeet.activities.UserMeetings.UserMeetings;
+
 
 public class Viewattendeesfragment extends Fragment
 {
     ArrayList<String> attendeeList = null;
     Attendee_Recycler_Adapter attendeeRecyclerAdapter;
-    public List<Event> googleEvents = camtrack.cmeet.activities.MainActivity.items();
-    public List<event_model> cmeet_list = MainActivity.get_cmeet_event_list();
+    public List<event_model> cmeet_list;
+    public int ClickedItem;
+    public List<UserMeetings> Viewattendees_List_of_User_Meetings;
+
     Boolean is_list_attendeeList_filled = true;
-    String[] a = {"Deea","qzdazd","adazdz","azdzda","adazdad","adazdadaz","azdazdazdaz","azdazdazdzd","zdadazd"};
     Attendee_Recycler_Adapter.ViewHolder viewHolder;
     RecyclerView recyclerView;
     public Viewattendeesfragment() {
@@ -63,8 +63,10 @@ public class Viewattendeesfragment extends Fragment
             attendeeList = new ArrayList<>(Arrays.asList(cmeet_list.get(ClickedItem).getAttendee()));
         }
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
-        //Attendee_Recycler_Adapter attendeeRecyclerAdapter = new Attendee_Recycler_Adapter(a,getContext());
         attendeeRecyclerAdapter = new Attendee_Recycler_Adapter(attendeeList,getContext(),this);
+        attendeeRecyclerAdapter.ClickedItem = ClickedItem;
+        attendeeRecyclerAdapter.cmeet_list = cmeet_list;
+        attendeeRecyclerAdapter.List_of_User_Meetings = Viewattendees_List_of_User_Meetings;
         recyclerView.setAdapter(attendeeRecyclerAdapter);
         return view;
     }

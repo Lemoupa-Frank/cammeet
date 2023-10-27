@@ -19,36 +19,24 @@
         <TextView
             android:id="@+id/department_name"
             android:layout_width="200dp"
-            android:layout_height="30dp"
-            android:hint="User Email"
-            android:gravity="start"
+            android:layout_height="wrap_content"
+            android:hint="Department role"
+            android:gravity="center"
             android:layout_margin="10dp"
             android:textColor="@color/black_white"
             android:backgroundTint="@color/icon_color"
             android:background="@drawable/attendee_recycler_background"
             android:textSize="20sp" />
-        <Spinner
-            android:id="@+id/department_role"
-            android:layout_width="200dp"
-            android:layout_height="30dp"
-            android:gravity="center"
-            android:layout_margin="10dp"
-            android:backgroundTint="@color/icon_color"
-            android:background="@drawable/attendee_recycler_background"
-            app:layout_constraintBottom_toBottomOf="@id/signup"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/password"
-            app:layout_constraintVertical_bias="0.332" />
+
         <EditText
-            android:id="@+id/department_passworw"
+            android:id="@+id/department_password"
             android:layout_width="200dp"
             android:layout_height="30dp"
             android:layout_margin="10dp"
             android:hint="@string/prompt_password"
             android:gravity="start"
             android:padding="5dp"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:backgroundTint="@color/icon_color"
             android:background="@drawable/attendee_recycler_background"
             android:textSize="20sp" />

@@ -15,4 +15,11 @@
     <color name="black_white">#FF000000</color>
     <color name="white_black">#FFFFFF</color>
     <color name="icon_color">#0022FF</color>
+    <color name="upper_rounded_squqre_background">#333333</color>
+    <color name="layout_background">#0022FF</color>
+    <color name="darker_layout_background">#253468</color>
+    <color name="Event_text_box">#0022FF</color>
 </resources>
+<!--darker layout 293E87-->
+    <!--darker layout 001743-->
+    <!--darker layout 253468-->

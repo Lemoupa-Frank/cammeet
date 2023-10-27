@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/attendee_recycler_background"
         android:gravity="center"
-        android:textColor="@color/black_white"
+        android:textColor="@color/white_black"
         android:textSize="18sp"
         android:textStyle="normal" />
 

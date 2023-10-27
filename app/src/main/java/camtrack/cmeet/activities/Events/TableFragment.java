@@ -1,8 +1,7 @@
 package camtrack.cmeet.activities.Events;
 
-import static camtrack.cmeet.activities.Events.EventAdapter.ClickedItem;
 
-import android.graphics.Bitmap;
+
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.os.Bundle;
@@ -25,6 +24,8 @@ import camtrack.cmeet.activities.MainActivity;
 public class TableFragment extends Fragment {
 
     public TableLayout tableLayout;
+
+    public int Clicked_Item;
     
 
 
@@ -46,10 +47,10 @@ public class TableFragment extends Fragment {
 
     private void addRowsToTable() {
         // Sample data for columns
-        String[] Attendee = MainActivity.cmeet_event_list.get(ClickedItem).getAttendee();
+        String[] Attendee = MainActivity.cmeet_event_list.get(Clicked_Item).getAttendee();
 
         int columnThreeImageResource = R.drawable.ic_launcher_foreground;
-        int Number_Rows = MainActivity.cmeet_event_list.get(ClickedItem).getAttendee() == null ? 0 : MainActivity.cmeet_event_list.get(ClickedItem).getAttendee().length;
+        int Number_Rows = MainActivity.cmeet_event_list.get(Clicked_Item).getAttendee() == null ? 0 : MainActivity.cmeet_event_list.get(Clicked_Item).getAttendee().length;
         // Add rows dynamically to the table based on your logic
 
 // Get the display metrics from the parent activity

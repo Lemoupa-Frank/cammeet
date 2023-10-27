@@ -31,10 +31,10 @@ public class PlaceholderContent {
 
     public static  String[] department_roles = {"Human Resource Head","Directeur de l'informatique","Directeur Du Service Après-vente","CEO" };
 
-    public static  String[] departent = {"Informatique","Service Après-vente","Technique","Comercial","Recherche Et Development","Contable","Resources Humains"};
+    public static  String[] department  = {"Informatique","Service Après-vente","Technique","Comercial","Recherche Et Development","Contable","Resources Humains"};
 
 
-    private static final int COUNT = departent.length;
+    private static final int COUNT = department_roles.length;
 
     static {
         // Add some sample items.
@@ -49,7 +49,7 @@ public class PlaceholderContent {
     }
 
     private static PlaceholderItem createPlaceholderItem(int position) {
-        return new PlaceholderItem(String.valueOf(position), departent[position - 1], makeDetails(position));
+        return new PlaceholderItem(String.valueOf(position), department_roles[position - 1], makeDetails(position));
     }
 
     private static String makeDetails(int position) {

@@ -65,40 +65,6 @@ public class Request_Maker
         });
     }
 
-    /**
-     * Retrofit call to get the list of users and their roles in selected meeting
-     * Onsucess modifies LUM the static variable that stores the list
-     * @param retrofitObject Retrofit object already instantiated
-     * @param meetsId The id of the meeting you wish to get the Users
-     */
-    public void getAttendees(Retrofit retrofitObject, String meetsId, Context con)
-    {
-        Request_Route RR = retrofitObject.create(Request_Route.class);
-        Call<List<UserMeetings>> _getAttendees = RR.get_attendees(meetsId);
-        _getAttendees.enqueue(new Callback<List<UserMeetings>>() {
-            @Override
-            public void onResponse(@NonNull Call<List<UserMeetings>> call, @NonNull Response<List<UserMeetings>> response) {
-                if(response.isSuccessful())
-                {
-                    ViewEvent.LUM = response.body();
-                    Toast.makeText(con,"Success",Toast.LENGTH_LONG).show();
-                }
-                else
-                {
-                    Toast.makeText(con,"Something Went wrong",Toast.LENGTH_LONG).show();
-                    System.out.println("********************************************************");
-                    System.out.println(response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<List<UserMeetings>> call, @NonNull Throwable t) {
-                {
-                    Toast.makeText(con,t.toString(),Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-    }
     public void meetings(Retrofit retrofitObject, event_model cm, Dialog delaydialog, Context con)
     {
         Request_Route RR = retrofitObject.create(Request_Route.class);
@@ -121,7 +87,7 @@ public class Request_Maker
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                 delaydialog.cancel();
-                Toast.makeText(con,"Check Your Connection",Toast.LENGTH_LONG).show();
+                Toast.makeText(con,R.string.Server_down,Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -157,10 +123,12 @@ public class Request_Maker
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                 delaydialog.cancel();
                 signature_dial.cancel();
-                Toast.makeText(con,"Check Your Connection",Toast.LENGTH_LONG).show();
+                Toast.makeText(con,R.string.Server_down,Toast.LENGTH_LONG).show();
             }
         });
     }
+
+
 
 
     /**

@@ -1,5 +1,5 @@
 <inset xmlns:android="http://schemas.android.com/apk/res/android"
-    android:drawable="@drawable/icon_cm"
+    android:drawable="@drawable/newlogocamtrack"
     android:insetLeft="40dp"
     android:insetRight="40dp"
     android:insetTop="40dp"

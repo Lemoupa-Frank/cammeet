@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    android:layout_width="wrap_content"
+<RelativeLayout android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp"
     xmlns:android="http://schemas.android.com/apk/res/android">
-
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardElevation="24dp"
+        android:layout_gravity="start"
+        app:cardBackgroundColor="@color/darker_layout_background"
+        app:cardCornerRadius="24dp">
     <TextView
         android:id="@+id/textEventSummary"
         android:layout_width="150dp"
         android:layout_height="200dp"
         android:background="@drawable/itemholder"
         android:gravity="center"
-        android:textColor="@color/black_white"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textColor="@color/white_black"
+        android:textSize="16sp" />
+    </androidx.cardview.widget.CardView>
 </RelativeLayout>

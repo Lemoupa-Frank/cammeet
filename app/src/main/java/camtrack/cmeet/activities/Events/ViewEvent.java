@@ -1,17 +1,21 @@
 package camtrack.cmeet.activities.Events;
 
-import static camtrack.cmeet.activities.Events.EventAdapter.ClickedItem;
+
 
 
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
@@ -26,6 +30,7 @@ import com.google.gson.JsonParser;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -51,15 +56,12 @@ public class ViewEvent extends AppCompatActivity {
     ActivityViewEventBinding viewEventBinding;
 
 
-    int Selected_Event; Retrofit retrofitobj;
-    public List<Event> a = MainActivity.items();
-
     static public MutableLiveData<String> observe_signature_click;
 
     static Observer<String> observer_signature;
-    static public List<UserMeetings> LUM; // A network call is done once an event is selected to modify LUM
-    // Make LUM mutable, so you can Create viewevent fragment and if LUM loads and is non null recreate it
-    public List<event_model> event_List = MainActivity.get_cmeet_event_list();
+    public List<UserMeetings> LUM = new ArrayList<>();;
+    public List<event_model> event_List = new ArrayList<>();
+    int Selected_Event;
     private webSocketClient WebSocketClients;
     boolean Signable = false;
     Message startSign;
@@ -70,17 +72,41 @@ public class ViewEvent extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        //Start  a process to get user's Meeting, this is what you will use to set
-        //Owners in the Attendee Recycler fragment will be determin by this
-        // You can put a mutable boolean to create fragment once you
-        // get a network reply
+        viewEventBinding = ActivityViewEventBinding.inflate(getLayoutInflater());
+        ConstraintLayout backgroundLayout = viewEventBinding.getRoot();
+        int statusBarColor = ((ColorDrawable) backgroundLayout.getBackground()).getColor();
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(statusBarColor);
+        window.setNavigationBarColor(statusBarColor);
         observe_signature_click = new MutableLiveData<>();
         User user = MainActivity.getuser();
         super.onCreate(savedInstanceState);
-        Selected_Event = ClickedItem;
-        viewEventBinding = ActivityViewEventBinding.inflate(getLayoutInflater());
+        Intent intent = getIntent();
+        java.io.Serializable serializable_event_list_Extra = intent.getSerializableExtra("EVENT_LIST");
+        java.io.Serializable serializable_User_List_Extra = intent.getSerializableExtra("UserMeetingList");
+        List<?> serializable_Event_List = (List<?>) serializable_event_list_Extra;
+        if (serializable_Event_List != null) {
+            for (Object item : serializable_Event_List) {
+                if (item instanceof event_model) {
+                    event_model event = (event_model) item;
+                    event_List.add(event);
+                }
+            }
+        }
+        List<?> serializableUserList = (List<?>) serializable_User_List_Extra;
+        if (serializableUserList != null) {
+            for (Object item : serializableUserList) {
+                if (item instanceof UserMeetings) {
+                    UserMeetings userMeetings = (UserMeetings) item;
+                    LUM.add(userMeetings);
+                }
+            }
+        }
+
+        Selected_Event = intent.getIntExtra("selected_item",0);
         this.eventmodel = event_List.get(Selected_Event);
-        if(check_owner(user.getUserId(),a.get(Selected_Event).getOrganizer().getEmail())) {viewEventBinding.edit.setVisibility(View.VISIBLE);}
+        if(check_owner(user.getUserId(),event_List.get(Selected_Event).getOwner())) {viewEventBinding.edit.setVisibility(View.VISIBLE);}
         try
         {
             serverUri = new URI("ws://192.168.43.107:8085");
@@ -89,6 +115,8 @@ public class ViewEvent extends AppCompatActivity {
             e.printStackTrace();
         }
         final webSocketClient wb = new webSocketClient(serverUri);
+        wb.ClickedItem = Selected_Event;
+        wb.event_modelList= event_List;
         wb.connect();
         WebSocketClients = wb;
 
@@ -97,6 +125,9 @@ public class ViewEvent extends AppCompatActivity {
 
 
         Viewattendeesfragment fragment = new Viewattendeesfragment();
+        fragment.cmeet_list = event_List;
+        fragment.ClickedItem = Selected_Event;
+        fragment.Viewattendees_List_of_User_Meetings = LUM;
         getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.attendeesfragment, fragment)
@@ -108,6 +139,7 @@ public class ViewEvent extends AppCompatActivity {
         viewEventBinding.location.setText(event_List.get(Selected_Event).getLocation()==null?" ":event_List.get(Selected_Event).getLocation());
         viewEventBinding.Owner.setText(event_List.get(Selected_Event).getOwner()==null?" ":event_List.get(Selected_Event).getOwner());
         viewEventBinding.Description.setText(event_List.get(Selected_Event).getDescription()==null?" ":event_List.get(Selected_Event).getDescription());
+        viewEventBinding.meetingid.setText(event_List.get(Selected_Event).getMeetingId());
 
         viewEventBinding.startsigning.setOnClickListener(v->
         {
@@ -132,21 +164,13 @@ public class ViewEvent extends AppCompatActivity {
         });
         viewEventBinding.edit.setOnClickListener(v->
         {
-            retrofitobj = Retrofit_Base_Class.getClient();
-
-              Intent a = new Intent(ViewEvent.this,EditEvent.class);
+            Intent a = new Intent(ViewEvent.this,EditEvent.class);
+            a.putExtra("EVENT_LIST", new ArrayList<>(event_List));
+            a.putExtra("selected_item", Selected_Event);
+            a.putExtra("UserMeetingList", new ArrayList<>(LUM));
               startActivity(a);
 
         });
-
-
-        /*viewEventBinding.sign.setOnClickListener(f->{
-            viewEventBinding.addparticipant.setVisibility(View.GONE);
-            tableFragment = new TableFragment();
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.attendeesfragment, tableFragment); // Replace R.id.fragmentContainer with the ID of your fragment container
-            transaction.commit();
-        });*/
 
         observer_signature = s ->
         {
@@ -177,10 +201,6 @@ public class ViewEvent extends AppCompatActivity {
                     Request_Maker request_maker = new Request_Maker();
                     Dialog cdelay =  cmeet_delay.delaydialogCircular(ViewEvent.this);
                     request_maker.update_usermeets(retrofit,userInmeet,cdelay,ViewEvent.this,wb,startSign,signature_dial);
-                    /*Gson gson = new Gson();
-                    String json = gson.toJson(startSign);
-                    byte[] bytess = json.getBytes();
-                    wb.send(ByteBuffer.wrap(bytess));*/
                 });
                 signature_dial.findViewById(R.id.restartsignature).setOnClickListener(view ->
                         ss.clearSignature());
@@ -203,6 +223,7 @@ public class ViewEvent extends AppCompatActivity {
                         {
                             viewEventBinding.addparticipant.setVisibility(View.GONE);
                             tableFragment = new TableFragment();
+                            tableFragment.Clicked_Item = Selected_Event;
                             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                             transaction.replace(R.id.attendeesfragment, tableFragment);
                             transaction.commit();
@@ -214,6 +235,7 @@ public class ViewEvent extends AppCompatActivity {
                             {
                                 viewEventBinding.addparticipant.setVisibility(View.GONE);
                                 tableFragment = new TableFragment();
+                                tableFragment.Clicked_Item = Selected_Event;
                                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                                 transaction.replace(R.id.attendeesfragment, tableFragment);
                                 transaction.commit();
@@ -233,9 +255,11 @@ public class ViewEvent extends AppCompatActivity {
             Message myObject = gson.fromJson(jsons, Message.class);
             System.out.println(jsons);
             int pos = -8;
-            for (int i = 0; i < MainActivity.cmeet_event_list.get(ClickedItem).getAttendee().length; i++)
+            // Getting the position of the sender in the signature table, by
+            // getting his position in the array of attendees
+            for (int i = 0; i < event_List.get(Selected_Event).getAttendee().length; i++)
             {
-                if(myObject.getSender().equals(MainActivity.cmeet_event_list.get(ClickedItem).getAttendee()[i]))
+                if(myObject.getSender().equals(event_List.get(Selected_Event).getAttendee()[i]))
                 {
                     pos  = i;
                 }

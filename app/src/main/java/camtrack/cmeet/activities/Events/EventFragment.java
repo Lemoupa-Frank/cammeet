@@ -17,8 +17,7 @@ import camtrack.cmeet.R;
 import camtrack.cmeet.activities.MainActivity;
 
 public class EventFragment extends Fragment {
-    // Assuming the events are already stored in this list.
-   // MainActivity mn = new MainActivity();
+
     public List<Event> a = MainActivity.items();
     public EventFragment() {
         // Required empty public constructor
