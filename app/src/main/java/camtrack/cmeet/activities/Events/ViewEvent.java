@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,8 +21,6 @@ import androidx.lifecycle.Observer;
 
 import java.io.ByteArrayOutputStream;
 
-import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.EventAttendee;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -59,7 +56,7 @@ public class ViewEvent extends AppCompatActivity {
     static public MutableLiveData<String> observe_signature_click;
 
     static Observer<String> observer_signature;
-    public List<UserMeetings> LUM = new ArrayList<>();;
+    public List<UserMeetings> LUM = new ArrayList<>();
     public List<event_model> event_List = new ArrayList<>();
     int Selected_Event;
     private webSocketClient WebSocketClients;
@@ -67,7 +64,6 @@ public class ViewEvent extends AppCompatActivity {
     Message startSign;
     event_model eventmodel;
     URI serverUri = null;
-    boolean event_owner = false;
     TableFragment tableFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -143,7 +139,6 @@ public class ViewEvent extends AppCompatActivity {
 
         viewEventBinding.startsigning.setOnClickListener(v->
         {
-            //think about connect in this very button and add delay to obtain server return
             if(wb.isOpen())
             {
                 startSign = new Message();
@@ -172,6 +167,8 @@ public class ViewEvent extends AppCompatActivity {
 
         });
 
+
+        // observes for click on signature table view
         observer_signature = s ->
         {
             startSign = new Message();
@@ -204,9 +201,10 @@ public class ViewEvent extends AppCompatActivity {
                 });
                 signature_dial.findViewById(R.id.restartsignature).setOnClickListener(view ->
                         ss.clearSignature());
-        };};
+        }};
         observe_signature_click.observe(this,observer_signature);
 
+        //observer for string message from website
         wb._Message.observe(this,v->
         {
 
@@ -246,6 +244,8 @@ public class ViewEvent extends AppCompatActivity {
                 }
             }
         });
+
+        // observer from byte message from websoket
         wb.ByteMessage.observe(this,a->{
             ByteBuffer bytes =  wb.ByteMessage.getValue();
             String jsons = new String(Objects.requireNonNull(bytes).array(), bytes.position(), bytes.remaining());
@@ -296,16 +296,7 @@ public class ViewEvent extends AppCompatActivity {
         return User.equals(Owner);
     }
 
-    public static String getCleanedDisplayNames(List<EventAttendee> attendeesList) {
-        StringBuilder cleanedNames = new StringBuilder();
 
-        for (EventAttendee attendee : attendeesList) {
-            String displayName = attendee.getEmail();
-            cleanedNames.append(displayName).append("\n\n");
-        }
-
-        return cleanedNames.toString();
-    }
 
     /**
      * For now it doesnt serve much as setting an Edittext invisible

@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.Display;
 import android.view.Window;
 import android.view.WindowManager;
@@ -40,6 +41,8 @@ public class EditEvent extends AppCompatActivity
     List<UserMeetings> EuserMeetings = new ArrayList<>();
     private int Selected_Event;
     Dialog dialog;
+
+    ArrayList<String> attendee = new ArrayList<>();
    public static ArrayList<String> Selected_Event_attendeeList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +78,9 @@ public class EditEvent extends AppCompatActivity
         Selected_Event = intent.getIntExtra("selected_item",0);
         user = camtrack.cmeet.activities.MainActivity.getuser();
         dialog = new Dialog(this);
+        if(event_list.get(Selected_Event).getAttendee() != null)
+        { attendee = new ArrayList<>(Arrays.asList(event_list.get(Selected_Event).getAttendee()));}
+        else{attendee = new ArrayList<>();}
         activityEditEventBinding.editDescription.setText(event_list.get(Selected_Event).getDescription());
         activityEditEventBinding.editlocation.setText(event_list.get(Selected_Event).getLocation());
         activityEditEventBinding.editSummary.setText(event_list.get(Selected_Event).getTitle());
@@ -88,16 +94,13 @@ public class EditEvent extends AppCompatActivity
                     .replace(R.id.editattendeesfragment, fragment)
                     .commit();
 
-        activityEditEventBinding.save.setOnClickListener(v->
+        activityEditEventBinding.saveEvent.setOnClickListener(v->
         {
             event_list.get(Selected_Event).setTitle(activityEditEventBinding.editSummary.getText().toString());
             event_list.get(Selected_Event).setLocation(activityEditEventBinding.editlocation.getText().toString());
             event_list.get(Selected_Event).setDescription(activityEditEventBinding.editDescription.getText().toString());
-
-
-            //check fragment.getAttendee list is not null
-
-            event_list.get(Selected_Event).setAttendee(fragment.getAttendeeList().toArray(new String[0]));
+            event_list.get(Selected_Event).setAttendee(attendee.toArray(new String[0]));
+            Toast.makeText(EditEvent.this, attendee.toString(), Toast.LENGTH_LONG).show();
             Retrofit R = Retrofit_Base_Class.getClient();
             Request_Maker RM = new Request_Maker();
             Dialog delaydialog = cmeet_delay.delaydialogCircular(this);
@@ -106,16 +109,13 @@ public class EditEvent extends AppCompatActivity
         activityEditEventBinding.newparticipant.setOnClickListener(c->
         {
             Dialog event_dial;
-            ArrayList<String> attendee;
             event_dial = newparticipantDialog();
             event_dial.show();
             TextView newatt  = event_dial.findViewById(R.id.newattendee);
-            if(event_list.get(Selected_Event).getAttendee() != null)
-            { attendee = new ArrayList<>(Arrays.asList(event_list.get(Selected_Event).getAttendee()));}
-            else{attendee = new ArrayList<>();}
+
             event_dial.findViewById(R.id.add_email).setOnClickListener(view ->
             {
-                if(newatt.getText()  != null)
+                if(newatt.getText()  != null )
                 {
                     if(attendee.contains(newatt.getText().toString()))
                     {
@@ -123,21 +123,27 @@ public class EditEvent extends AppCompatActivity
                     }
                     else
                     {
-                        attendee.add(newatt.getText().toString());
+                        if(Patterns.EMAIL_ADDRESS.matcher(newatt.getText().toString()).matches())
+                        {attendee.add(newatt.getText().toString());}
+                        else {
+                            Toast.makeText(this,"Inserez un E-mail valid ",Toast.LENGTH_LONG).show();
+
+                        }
                     }
                     newatt.setText(null);
                 }
-                Toast.makeText(this,"checked Clicked",Toast.LENGTH_LONG).show();
             });
             event_dial.findViewById(R.id.valid).setOnClickListener(validate->
             {
                 event_list.get(Selected_Event).setAttendee(attendee.toArray(new String[0]));
                 Viewattendeesfragment Nfragment = new Viewattendeesfragment();
+                Nfragment.cmeet_list = event_list;
+                Nfragment.ClickedItem = Selected_Event;
+                Nfragment.Viewattendees_List_of_User_Meetings = EuserMeetings;
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.editattendeesfragment, Nfragment)
                         .commit();
-                Toast.makeText(this,"valid Clicked",Toast.LENGTH_LONG).show();
             });
             event_dial.findViewById(R.id.cancel).setOnClickListener(cancel->{
                 event_dial.cancel();
@@ -153,7 +159,6 @@ public class EditEvent extends AppCompatActivity
         Point size = new Point();
         display.getSize(size);
         int width = size.x;
-        int height = size.y;
         Objects.requireNonNull(dialog.getWindow()).setLayout(5 * (width) / 7, 1618 * (width) / 1000);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.setCanceledOnTouchOutside(false);

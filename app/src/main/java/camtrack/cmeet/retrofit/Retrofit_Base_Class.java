@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
+import retrofit2.converter.jackson.JacksonConverterFactory;
 
 
 public class Retrofit_Base_Class {
@@ -15,12 +16,15 @@ public class Retrofit_Base_Class {
 // declaring retrofit class
     public static Retrofit retrofit;
 
+    public static  Retrofit retrofit_JacksonConverterFactory;
+
     public static Retrofit retrofit_String;
     
 // creating a converter and make it lenient    
     private static final Gson gson = new GsonBuilder()
             .setLenient()
             .create();
+    //private static final Jackson
 // method to instantiate and return a retrofit object            
     public static Retrofit getClient(){
         if(retrofit == null){
@@ -38,5 +42,15 @@ public class Retrofit_Base_Class {
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .build();
         return retrofit_String;
+    }
+
+    public static Retrofit getClient_JacksonConverterFactory(){
+        if(retrofit_JacksonConverterFactory == null){
+            retrofit_JacksonConverterFactory = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .addConverterFactory(JacksonConverterFactory.create())
+                    .build();
+        }
+        return retrofit_JacksonConverterFactory;
     }
 }

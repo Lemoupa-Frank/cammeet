@@ -38,7 +38,7 @@ MainActivity fragment;
 
         matricesFragment = new matrices_fragment();
         fragment = new MainActivity();
-        if(user.getRole().equals("MEMBER"))
+        if(user.getRole().equals("MEMBER") || user.getRole().equals(""))
         {
             roleFragment = new RoleFragment();
         }

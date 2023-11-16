@@ -6,7 +6,10 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -47,6 +50,11 @@ public class login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         sharedPreferences= getSharedPreferences("User", Context.MODE_PRIVATE);
         binding_log = ActivityLoginBinding.inflate(getLayoutInflater());
+        int statusBarColor = ((ColorDrawable) binding_log.getRoot().getBackground()).getColor();
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(statusBarColor);
+        window.setNavigationBarColor(statusBarColor);
         setContentView(binding_log.getRoot());
 
         editor = sharedPreferences.edit();

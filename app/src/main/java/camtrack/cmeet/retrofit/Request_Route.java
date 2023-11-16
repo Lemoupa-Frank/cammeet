@@ -65,5 +65,8 @@ public interface Request_Route
     @GET("store_meet/Get_a_meeting")
     Call<event_model> get_meeting(@Query("meetingsId") String MeetingId);
 
+    @GET("store_meet/meeting_attendance")
+    Call<List<UserMeetings>> get_meeting_attendance(@Query("meetingsId") String MeetingId);
+
 }
 

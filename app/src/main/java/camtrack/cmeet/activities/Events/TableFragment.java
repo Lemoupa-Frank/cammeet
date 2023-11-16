@@ -56,7 +56,6 @@ public class TableFragment extends Fragment {
 // Get the display metrics from the parent activity
         DisplayMetrics displayMetrics = new DisplayMetrics();
         int dividedWidth = 250;
-        int dividedHeight = 250;
         if (getActivity() != null) {
             getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
@@ -75,12 +74,9 @@ public class TableFragment extends Fragment {
 
             columnName.setText(extractNameFromEmail(Attendee[i]));
 
-            columnName.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+            columnName.setOnClickListener(v -> {
 
-                    }
-                });
+            });
 
             TextView attendee_text_holder = new TextView(requireContext());
 
@@ -127,9 +123,8 @@ public class TableFragment extends Fragment {
     public void changeColumnImage(int rowIndex,byte[] bitmap)
     {
         row = (TableRow) tableLayout.getChildAt(rowIndex + 1); // Get the desired row
-        //Bitmap sbitmap = resizeBitmap(bitmap,75,75);
+        Toast.makeText(requireContext(), "changeColumncallde", Toast.LENGTH_LONG).show();
         if (row != null) {
-            //bitmap.setPremultiplied(true);
             View columnView = row.getChildAt(2); // Get the desired column view
             ImageView columnImageView = (ImageView) columnView; // Cast the column view to ImageView
             columnImageView.setImageBitmap(BitmapFactory.decodeByteArray(bitmap, 0, bitmap.length));

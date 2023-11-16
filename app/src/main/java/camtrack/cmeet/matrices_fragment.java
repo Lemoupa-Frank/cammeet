@@ -1,11 +1,11 @@
 package camtrack.cmeet;
 
-import static camtrack.cmeet.activities.DatePickerFragment.enddatetemp;
 import static camtrack.cmeet.activities.DatePickerFragment.startdatetemp;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.app.Dialog;
 import android.graphics.Color;
@@ -26,7 +26,6 @@ import android.widget.Toast;
 
 import com.google.api.client.util.DateTime;
 
-import java.sql.Array;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -36,8 +35,9 @@ import java.util.Objects;
 
 import camtrack.cmeet.activities.DatePickerFragment;
 import camtrack.cmeet.activities.Events.MainActivityEventFragment;
+import camtrack.cmeet.activities.Events.TableFragment;
 import camtrack.cmeet.activities.Events.event_model;
-import camtrack.cmeet.activities.cmeet_delay;
+import camtrack.cmeet.activities.UserMeetings.UserMeetings;
 import camtrack.cmeet.activities.login.model.User;
 import camtrack.cmeet.databinding.ActivityMatricesEventsBinding;
 import camtrack.cmeet.retrofit.Request_Route;
@@ -76,6 +76,29 @@ public class matrices_fragment extends Fragment {
         binding.userDetailsShimmer.hideShimmer();
         TextView get_meetings;
         get_meetings = binding.getMeetings;
+
+        binding.attendeeDetailsForMeeting.setOnClickListener(v->{
+            Dialog dialog = dialog();
+            Button startdate = dialog.findViewById(R.id.buttonstartdate);
+            Button enddate = dialog.findViewById(R.id.buttonenddate);
+            EditText meeting_id = dialog.findViewById(R.id.dialog_edit_text);
+            Button cancel = dialog.findViewById(R.id.cancel);
+            Button validate = dialog.findViewById(R.id.valid);
+            startdate.setVisibility(View.GONE);
+            enddate.setVisibility(View.GONE);
+            meeting_id.setVisibility(View.VISIBLE);
+            dialog.show();
+            cancel.setOnClickListener(can -> {
+                dialog.cancel();
+            });
+            validate.setOnClickListener(val -> {
+                Retrofit rtb = Retrofit_Base_Class.getClient_JacksonConverterFactory();
+                Request_Route RR = rtb.create(Request_Route.class);
+                Call<List<UserMeetings>> attendance = RR.get_meeting_attendance(meeting_id.getText().toString());
+                get_attendance(attendance);
+                dialog.cancel();
+            });
+        });
 
         binding.Absentees.setOnClickListener(v ->
         {
@@ -374,7 +397,51 @@ public class matrices_fragment extends Fragment {
         });
     }
 
+    public void get_attendance(Call<List<UserMeetings>> get_attendance) {
+        binding.attendeeDetailsShimmer.showShimmer(true);
+        get_attendance.enqueue(new Callback<List<UserMeetings>>() {
+            @Override
+            public void onResponse(@androidx.annotation.NonNull Call<List<UserMeetings>> call, @androidx.annotation.NonNull Response<List<UserMeetings>> response) {
+                binding.attendeeDetailsShimmer.hideShimmer();
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                       String[] attendee_name = new String[response.body().size()];
+                       String[] attendee_email = new String[response.body().size()];
+                       String[] role =  new String[response.body().size()];
+                       List<byte[]> signature = new ArrayList<>();
+                       int i = 0;
+                       for(UserMeetings um : response.body())
+                       {
+                           attendee_name[i] = TableFragment.extractNameFromEmail(um.getUserMeetingsPK().getUserId());
+                           attendee_email[i] = um.getUserMeetingsPK().getUserId();
+                           role[i] = um.getRole();
+                           signature.add(um.getSignature_data());
+                           i = i+1;
 
+                       }
+                        attendance_table_fragment tableFragment = new attendance_table_fragment();
+                        tableFragment.setAttendee_email(attendee_email); tableFragment.setAttendee_names(attendee_name);
+                        tableFragment.setNumberofaatendees(response.body().size()); tableFragment.setRole(role);
+                        tableFragment.setAttendee_signature(signature);
+                                getChildFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.attendance_details_frame, tableFragment)
+                                .commit();
+                        binding.attendanceDetailsFrame.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    Toast.makeText(getContext(), response.toString(), Toast.LENGTH_LONG).show();
+                    System.out.println(response);
+                }
+            }
+
+            @Override
+            public void onFailure(@androidx.annotation.NonNull Call<List<UserMeetings>> call, @NonNull Throwable t) {
+                Toast.makeText(getContext(), "Failure: " + t, Toast.LENGTH_LONG).show();
+                binding.attendeeDetailsShimmer.hideShimmer();
+            }
+        });
+    }
 
     public DateTime getStartdatetemp() {
         return startdatetemp;

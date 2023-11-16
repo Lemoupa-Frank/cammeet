@@ -4,8 +4,11 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Patterns;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ArrayAdapter;
@@ -15,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.splashscreen.SplashScreen;
 
 import com.google.errorprone.annotations.Var;
@@ -54,6 +58,12 @@ public class Signup extends AppCompatActivity {
         Editform = new EditText[]{signupbinding.username, signupbinding.Email, signupbinding.phone, signupbinding.password};
         set_spinner(Department_Spinner,Signup.this, R.array.Departments);
         retrofitobj = Retrofit_Base_Class.getClient();
+        ConstraintLayout CL = signupbinding.getRoot();
+        int statusBarColor = ((ColorDrawable) CL.getBackground()).getColor();
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(statusBarColor);
+        window.setNavigationBarColor(statusBarColor);
         setContentView(signupbinding.getRoot());
         // Do assynchronous calls to database to check if user exist
         signupbinding.signup.setOnClickListener(v->

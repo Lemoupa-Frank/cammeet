@@ -162,6 +162,7 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
         android:text="@string/authorise_siging"
+        android:textColor="@color/darker_layout_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/scroll"
         app:layout_constraintStart_toStartOf="parent" />

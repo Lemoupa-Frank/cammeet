@@ -31,7 +31,7 @@
     </androidx.cardview.widget.CardView>
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -39,6 +39,7 @@
             android:layout_marginTop="178dp"
             android:layout_marginBottom="40dp"
             android:layout_gravity="center"
+            android:gravity="center"
             android:orientation="vertical">
 
             <androidx.cardview.widget.CardView
@@ -157,7 +158,7 @@
                             android:layout_height="wrap_content"
                             android:layout_margin="16dp"
                             android:gravity="center"
-                            android:text="Tous les réunions pour une période"
+                            android:text="Tous les reunions de çe department pour une periode specific"
                             android:textColor="@color/white_black"
                             android:textSize="18sp" />
                     </LinearLayout>
@@ -244,7 +245,7 @@
                             android:contentDescription="@string/location_image_view" />
 
                         <TextView
-                            android:id="@+id/ettendee_details_for_meeting"
+                            android:id="@+id/attendee_details_for_meeting"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_margin="16dp"
@@ -256,7 +257,12 @@
                 </com.facebook.shimmer.ShimmerFrameLayout>
 
             </androidx.cardview.widget.CardView>
-            <!-- This Will recieve user meetings -->
+            <FrameLayout
+                android:id="@+id/attendance_details_frame"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
             <androidx.cardview.widget.CardView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
