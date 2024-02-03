@@ -23,10 +23,10 @@
             android:hint="Department role"
             android:gravity="center"
             android:layout_margin="10dp"
-            android:textColor="@color/black_white"
-            android:backgroundTint="@color/icon_color"
-            android:background="@drawable/attendee_recycler_background"
-            android:textSize="20sp" />
+            android:textColor="@color/white_black"
+            android:backgroundTint="@null"
+            android:textStyle="bold"
+            android:textSize="22sp" />
 
         <EditText
             android:id="@+id/department_password"
@@ -34,12 +34,14 @@
             android:layout_height="30dp"
             android:layout_margin="10dp"
             android:hint="@string/prompt_password"
-            android:gravity="start"
+            android:textColorHint="@color/white_black"
+            android:gravity="center"
+            android:layout_gravity="center"
             android:padding="5dp"
             android:textColor="@color/white"
             android:backgroundTint="@color/icon_color"
             android:background="@drawable/attendee_recycler_background"
-            android:textSize="20sp" />
+            android:textSize="14sp" />
 
     </LinearLayout>
 
@@ -56,6 +58,9 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:text="@string/validate"
+            android:textSize="11sp"
+            android:textColor="@color/white_black"
+            android:backgroundTint="@color/darker_layout_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/cancel"
             app:layout_constraintHorizontal_bias="0.146"
@@ -72,6 +77,9 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:text="@string/cancel"
+            android:textSize="11sp"
+            android:textColor="@color/white_black"
+            android:backgroundTint="@color/darker_layout_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

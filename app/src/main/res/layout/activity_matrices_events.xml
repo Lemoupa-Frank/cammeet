@@ -17,17 +17,18 @@
         app:cardCornerRadius="12dp"
         app:cardElevation="24dp">
 
-        <TextView
+        <Spinner
             android:id="@+id/departmentTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="27dp"
             android:background="@null"
+            android:clickable="false"
             android:gravity="start"
             android:text="Department Name"
             android:scaleX="1.1"
             android:textColor="@color/white_black"
-            android:textSize="36sp" />
+            android:textSize="50sp" />
     </androidx.cardview.widget.CardView>
     <ScrollView
         android:layout_width="match_parent"

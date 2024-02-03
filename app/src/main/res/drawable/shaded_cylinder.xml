@@ -12,7 +12,7 @@
         android:topRightRadius="100dp" />
     <gradient
         android:angle="90"
-        android:centerColor="#D3D3D3"
+        android:centerColor="@color/light_blue_600"
         android:offset="0.1"
         android:tileMode="repeat"
         android:startColor="@color/darker_layout_background"

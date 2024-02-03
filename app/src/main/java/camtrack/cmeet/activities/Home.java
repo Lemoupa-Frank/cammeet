@@ -1,9 +1,10 @@
 package camtrack.cmeet.activities;
 
-import static camtrack.cmeet.activities.MainActivity.user;
 import static camtrack.cmeet.activities.login.data.cache_user.cache_a_user;
 
+import camtrack.cmeet.activities.login.model.User;
 import camtrack.cmeet.databinding.FrameMainBinding;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
@@ -12,6 +13,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -20,9 +22,12 @@ import camtrack.cmeet.RoleFragment;
 import camtrack.cmeet.matrices_fragment;
 
 public class Home extends AppCompatActivity {
-RoleFragment roleFragment;
-matrices_fragment matricesFragment;
-MainActivity fragment;
+    RoleFragment roleFragment;
+    matrices_fragment matricesFragment;
+    User user;
+    public static String Role;
+    MainActivity fragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,58 +40,60 @@ MainActivity fragment;
         window.setNavigationBarColor(statusBarColor);
         SharedPreferences sharedPreferences = getSharedPreferences("User", Context.MODE_PRIVATE);
         user = cache_a_user(null, user, sharedPreferences);
-
-        matricesFragment = new matrices_fragment();
+        Role = user.getRole();
         fragment = new MainActivity();
-        if(user.getRole().equals("MEMBER") || user.getRole().equals(""))
-        {
-            roleFragment = new RoleFragment();
-        }
+        roleFragment = new RoleFragment();
+        matricesFragment = new matrices_fragment();
         setContentView(R.layout.frame_main);
-        if (savedInstanceState == null)
-        {
+        if (savedInstanceState == null) {
             matricesFragment.setDepart_name(user.getDepartment());
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container,roleFragment == null? matricesFragment:roleFragment)
+                    .add(R.id.container, roleFragment)
                     .add(R.id.container, fragment)
-                    .hide(roleFragment == null? matricesFragment:roleFragment)
+                    .add(R.id.container, matricesFragment)
+                    .hide(roleFragment)
+                    .hide(matricesFragment)
                     .commit();
         }
-        ImageView home =  findViewById(R.id.home);
+        ImageView home = findViewById(R.id.home);
         home.setOnClickListener(v ->
-        {
-
                 getSupportFragmentManager().beginTransaction()
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                        .hide(roleFragment == null? matricesFragment:roleFragment)
+                        .hide(roleFragment)
+                        .hide(matricesFragment)
                         .show(fragment)
-                        .commit();
+                        .commit());
 
-        });
-
-        ImageView matrix =  findViewById(R.id.matrix);
+        ImageView matrix = findViewById(R.id.matrix);
 
         matrix.setOnClickListener(v ->
         {
-            String Role =  user.getRole();
-            if(Role.equals("MEMBER"))
-            {
+            if (Role.equals("CEO")) {
                 getSupportFragmentManager().beginTransaction()
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                         .hide(fragment)
-                        .show(roleFragment == null? matricesFragment:roleFragment)
+                        .hide(roleFragment)
+                        .show(matricesFragment)
                         .commit();
-            } else if (Role.equals("CEO")) {
-
-            }
-            else
-            {
+            } else if (Role.equals("Human Resource Head")) {
                 getSupportFragmentManager().beginTransaction()
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                         .hide(fragment)
-                        .show(roleFragment == null? matricesFragment:roleFragment)
+                        .hide(roleFragment)
+                        .show(matricesFragment)
+                        .commit();
+            } else {
+                getSupportFragmentManager().beginTransaction()
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                        .hide(fragment)
+                        .hide(matricesFragment)
+                        .show(roleFragment)
                         .commit();
             }
+            // (Role.equals("MEMBER"))
         });
     }
+    /*
+
+     */
 }

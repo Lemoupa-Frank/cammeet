@@ -64,7 +64,6 @@ dependencies {
     implementation('com.squareup.retrofit2:converter-jackson:2.7.2')
 
 
-
     android {
         packagingOptions {
             exclude 'META-INF/DEPENDENCIES'

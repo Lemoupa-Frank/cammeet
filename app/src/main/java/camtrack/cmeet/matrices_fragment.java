@@ -1,13 +1,11 @@
 package camtrack.cmeet;
 
 import static camtrack.cmeet.activities.DatePickerFragment.startdatetemp;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
+import static camtrack.cmeet.activities.login.data.cache_user.cache_a_user;
 
 import android.app.Dialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
@@ -21,8 +19,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.google.api.client.util.DateTime;
 
@@ -58,6 +61,10 @@ public class matrices_fragment extends Fragment {
     ActivityMatricesEventsBinding binding;
     Retrofit retrofit = Retrofit_Base_Class.getClient_String();
 
+    Spinner department;
+
+    User user;
+
     public matrices_fragment() {
     }
 
@@ -67,7 +74,15 @@ public class matrices_fragment extends Fragment {
         super.onCreate(savedInstanceState);
         binding = ActivityMatricesEventsBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
-        binding.departmentTextView.setText(depart_name);
+        department = binding.departmentTextView;
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("User", Context.MODE_PRIVATE);
+        user = cache_a_user(null, user, sharedPreferences);
+        String Role =  user.getRole();
+        if(Role.equals("MEMBER"))
+        {
+            department.setEnabled(false);
+        }
+        set_spinner(department, requireContext(), R.array.Departments);
         binding.attendeeDetailsShimmer.hideShimmer();
         binding.getMeetingShimmer.hideShimmer();
         binding.getMeetingsShimmer.hideShimmer();
@@ -168,7 +183,7 @@ public class matrices_fragment extends Fragment {
             {
                 Retrofit rtb = Retrofit_Base_Class.getClient();
                 Request_Route RR = rtb.create(Request_Route.class);
-                Call<List<event_model>> get_department_meets = RR.get_department_meets(depart_name, Lstartdate, LEnddate);
+                Call<List<event_model>> get_department_meets = RR.get_department_meets(department.getSelectedItem().toString(), Lstartdate, LEnddate);
                 get_department_meets(get_department_meets);
                 dialog.cancel();
             });
@@ -457,6 +472,14 @@ public class matrices_fragment extends Fragment {
 
     public void setEnddatetemp(DateTime enddatetemp) {
         this.Eenddate = enddatetemp;
+    }
+
+    public void set_spinner(Spinner spinner, Context context, int array_resource_value)
+    {
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context,
+                array_resource_value, R.layout.selecte_department_spinner_layout);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
     }
 
 }

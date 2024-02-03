@@ -1,5 +1,7 @@
 package camtrack.cmeet;
 
+import static camtrack.cmeet.activities.Home.Role;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,6 +12,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -136,7 +139,7 @@ public class RoleFragment extends Fragment {
         display.getSize(size);
         int width = size.x;
         int height = size.y;
-        Objects.requireNonNull(dialog.getWindow()).setLayout((width),  (height) / 7);
+        Objects.requireNonNull(dialog.getWindow()).setLayout((width),  (height));
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.setCanceledOnTouchOutside(false);
         return dialog;
@@ -147,7 +150,7 @@ public class RoleFragment extends Fragment {
         Dialog delaydialog = cmeet_delay.delaydialogCircular(getContext());
         delaydialog.show();
         Request_Route RR = retrofitObject.create(Request_Route.class);
-        Call<String> CreateUserCall = RR.update_user_role(userid,"Human Resource Head",password);
+        Call<String> CreateUserCall = RR.update_user_role(userid,department_role.getText().toString(),password);
         CreateUserCall.enqueue(new Callback<String>() {
             @Override
             public void onResponse(@androidx.annotation.NonNull Call<String> call, @androidx.annotation.NonNull Response<String> response) {
@@ -157,14 +160,16 @@ public class RoleFragment extends Fragment {
                     SharedPreferences sharedPreferences; SharedPreferences.Editor editor;
                     sharedPreferences = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE);
                     editor = sharedPreferences.edit();
-                    editor.putString("Role", department_role.getText().toString());
+                    editor.putString("role", department_role.getText().toString());
                     String answer = response.body();
                     Toast.makeText(getContext(), "success" +  answer, Toast.LENGTH_LONG).show();
                     editor.apply();
                     Toast.makeText(getContext(), sharedPreferences.getString("Role",""), Toast.LENGTH_LONG).show();
+                    Role = role;
                 }
-                else {
-                    Toast.makeText(getContext(), "response.code()", Toast.LENGTH_LONG).show();
+                else
+                {
+                    Toast.makeText(getContext(), R.string.Server_down, Toast.LENGTH_LONG).show();
                     System.out.println(response);
                     delaydialog.cancel();
                 }
@@ -178,6 +183,10 @@ public class RoleFragment extends Fragment {
             }
         });
     }
-
+/*
+UPDATE "user"
+SET role = 'MEMBER'
+WHERE user_id = 'franklemoupa@gmail.com';
+ */
 
 }

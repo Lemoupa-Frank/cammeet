@@ -77,7 +77,7 @@ public class Signup extends AppCompatActivity {
             }
             else
             {
-                Toast.makeText(Signup.this, "Sorry User Could not be Created", Toast.LENGTH_LONG).show();
+                Toast.makeText(Signup.this, R.string.fil_form, Toast.LENGTH_LONG).show();
             }
         });
         signupbinding.loginSignPage.setOnClickListener(c->
@@ -175,7 +175,7 @@ public class Signup extends AppCompatActivity {
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t)
             {
                 delaydialog.cancel();
-                Toast.makeText(Signup.this, t.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(Signup.this, "An Error Occurred", Toast.LENGTH_LONG).show();
             }
         });
     }

@@ -7,7 +7,6 @@ import static camtrack.cmeet.activities.DatePickerFragment.startdate;
 import static camtrack.cmeet.activities.DatePickerFragment.startdatetemp;
 import static camtrack.cmeet.activities.login.data.cache_user.cache_a_user;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -15,18 +14,13 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.StringBuilderPrinter;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -74,7 +68,6 @@ import camtrack.cmeet.activities.login.model.User;
 import camtrack.cmeet.databinding.ActivityMainBinding;
 import camtrack.cmeet.databinding.DialogBinding;
 import camtrack.cmeet.matrices_fragment;
-import camtrack.cmeet.retrofit.Request_Route;
 import camtrack.cmeet.retrofit.Retrofit_Base_Class;
 import retrofit2.Retrofit;
 
@@ -251,7 +244,7 @@ public class MainActivity extends Fragment {
         Calendar service = new Calendar.Builder(transport, jsonFactory, googleAccountCredential)
                 .setApplicationName("cammeet")
                 .build();
-        DateTime begin;
+
 //DateTime.parseRfc3339("2023-05-09T13:40:09.000Z")
         try {
             events = service.events().list("primary")
@@ -363,18 +356,10 @@ public class MainActivity extends Fragment {
         Button cancel = dialog.findViewById(id.cancel);
         Button validate = dialog.findViewById(id.valid);
 
-        startdate.setOnClickListener(v -> {
-            StartDatePickerDialog();
-        });
-        enddate.setOnClickListener(v -> {
-            EndDatePickerDialog();
-        });
-        cancel.setOnClickListener(v -> {
-            dialog_canel();
-        });
-        validate.setOnClickListener(v -> {
-            dialog_validate();
-        });
+        startdate.setOnClickListener(v -> StartDatePickerDialog());
+        enddate.setOnClickListener(v -> EndDatePickerDialog());
+        cancel.setOnClickListener(v -> dialog_canel());
+        validate.setOnClickListener(v -> dialog_validate());
 
 
         return dialog;
@@ -472,8 +457,7 @@ public class MainActivity extends Fragment {
             }
         }
 
-        String formattedInitials = initials.toString().trim();
-        return formattedInitials;
+        return initials.toString().trim();
     }
 
 }

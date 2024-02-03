@@ -39,5 +39,7 @@
     <string name="end_signing">Arreter Les signature</string>
     <string name="sign">signé</string>
     <string name="no_events">Aucun événement trouvé</string>
+    <string name="fil_form">Veuillez remplir le formulaire</string>
+
 
 </resources>

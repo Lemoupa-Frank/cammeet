@@ -50,7 +50,7 @@ public class login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         sharedPreferences= getSharedPreferences("User", Context.MODE_PRIVATE);
         binding_log = ActivityLoginBinding.inflate(getLayoutInflater());
-        int statusBarColor = ((ColorDrawable) binding_log.getRoot().getBackground()).getColor();
+        int statusBarColor = getResources().getColor(R.color.darker_layout_background, getTheme());
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(statusBarColor);
