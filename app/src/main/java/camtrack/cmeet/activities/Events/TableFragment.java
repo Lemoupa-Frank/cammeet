@@ -71,6 +71,7 @@ public class TableFragment extends Fragment {
         for (int i = 0; i<Number_Rows; i++) {
             row = new TableRow(requireContext());
             TextView columnName = new TextView(requireContext());
+            columnName.setTextColor(getResources().getColor(R.color.white));
 
             columnName.setText(extractNameFromEmail(Attendee[i]));
 
@@ -79,7 +80,7 @@ public class TableFragment extends Fragment {
             });
 
             TextView attendee_text_holder = new TextView(requireContext());
-
+            attendee_text_holder.setTextColor(getResources().getColor(R.color.white));
             attendee_text_holder.setText(Attendee[i]);
 
             attendee_text_holder.setLayoutParams(new TableRow.LayoutParams(dividedWidth, 150));
@@ -95,11 +96,6 @@ public class TableFragment extends Fragment {
 
             // Add column 3 (ImageView)
             ImageView columnImageView = new ImageView(requireContext());
-            columnImageView.setImageResource(columnThreeImageResource);
-            // Customize the ImageView as needed (e.g., dimensions, scale type, etc.)
-            // ...
-
-            // Set the OnClickListener on the ImageView
             columnImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -123,7 +119,6 @@ public class TableFragment extends Fragment {
     public void changeColumnImage(int rowIndex,byte[] bitmap)
     {
         row = (TableRow) tableLayout.getChildAt(rowIndex + 1); // Get the desired row
-        Toast.makeText(requireContext(), "changeColumncallde", Toast.LENGTH_LONG).show();
         if (row != null) {
             View columnView = row.getChildAt(2); // Get the desired column view
             ImageView columnImageView = (ImageView) columnView; // Cast the column view to ImageView

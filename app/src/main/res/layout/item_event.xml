@@ -15,7 +15,7 @@
         android:id="@+id/textEventSummary"
         android:layout_width="150dp"
         android:layout_height="200dp"
-        android:background="@drawable/itemholder"
+        android:background="?android:attr/selectableItemBackground"
         android:gravity="center"
         android:textColor="@color/white_black"
         android:textSize="16sp" />

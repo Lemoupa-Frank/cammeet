@@ -177,8 +177,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                     I.putExtra("EVENT_LIST", new ArrayList<>(event_modelList));
                     I.putExtra("selected_item", ClickedItem);
                     con.startActivity(I);
-                    Toast.makeText(con,"Something Went wrong",Toast.LENGTH_LONG).show();
-                    System.out.println("********************************************************");
                     System.out.println(response.code());
                 }
             }

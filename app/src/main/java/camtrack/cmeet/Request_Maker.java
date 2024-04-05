@@ -35,38 +35,35 @@ import retrofit2.Retrofit;
  * like a UserMeetings converter to Hashmaps
  */
 
-public class Request_Maker
-{
-    public void store_todays_meets(Retrofit retrofitObject, Context con, List<event_model> a, MutableLiveData<List<event_model>> cmeet_list_observer)
-    {
+public class Request_Maker {
+    public void store_todays_meets(Retrofit retrofitObject, Context con, List<event_model> a, MutableLiveData<List<event_model>> cmeet_list_observer) {
         Request_Route RR = retrofitObject.create(Request_Route.class);
         Call<List<event_model>> CreateUserCall = RR.store_meets(a);
         CreateUserCall.enqueue(new Callback<List<event_model>>() {
             @Override
-            public void onResponse(@NonNull Call<List<event_model>> call, @NonNull Response<List<event_model>> response)
-            {
-                if(response.isSuccessful())
-                {
+            public void onResponse(@NonNull Call<List<event_model>> call, @NonNull Response<List<event_model>> response) {
+                if (response.isSuccessful()) {
                     cmeet_list_observer.postValue(response.body());
-                    MainActivity.cmeet_event_list = response.body();
-                    Toast.makeText(con, R.string.TrustMessage, Toast.LENGTH_LONG).show();
-                }
-                else
-                {
+                    assert response.body() != null;
+                    if (response.body().size() > 0) {
+                        MainActivity.cmeet_event_list = response.body();
+                    }
+                    else {
+                       // Toast.makeText(con, R.string.no_events, Toast.LENGTH_LONG).show();
+                    }
+                } else {
                     Toast.makeText(con, response.toString(), Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<List<event_model>> call, @NonNull Throwable t)
-            {
+            public void onFailure(@NonNull Call<List<event_model>> call, @NonNull Throwable t) {
                 Toast.makeText(con, t.toString(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    public void meetings(Retrofit retrofitObject, event_model cm, Dialog delaydialog, Context con)
-    {
+    public void meetings(Retrofit retrofitObject, event_model cm, Dialog delaydialog, Context con) {
         Request_Route RR = retrofitObject.create(Request_Route.class);
         Call<Void> Update_Meetings_Call = RR.update_meetes(cm);
         delaydialog.show();
@@ -74,48 +71,39 @@ public class Request_Maker
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 delaydialog.cancel();
-                if(response.isSuccessful())
-                {
-                    Toast.makeText(con,"Success",Toast.LENGTH_LONG).show();
-                }
-                else
-                {
-                    Toast.makeText(con,response.code() + " ",Toast.LENGTH_LONG).show();
+                if (response.isSuccessful()) {
+                    Toast.makeText(con, "Success", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(con, response.code() + " ", Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                 delaydialog.cancel();
-                Toast.makeText(con,R.string.Server_down,Toast.LENGTH_LONG).show();
+                Toast.makeText(con, R.string.Server_down, Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    public void  update_usermeets(Retrofit retrofitObject, UserMeetings UM, Dialog delaydialog, Context con, webSocketClient web_Socket, Message startSign, Dialog signature_dial)
-    {
+    public void update_usermeets(Retrofit retrofitObject, UserMeetings UM, Dialog delaydialog, Context con, webSocketClient web_Socket, Message startSign, Dialog signature_dial) {
         Request_Route RR = retrofitObject.create(Request_Route.class);
         Call<Void> Update_Meetings_Call = RR.user_meets(UM);
         delaydialog.show();
-        Update_Meetings_Call.enqueue(new Callback<Void>()
-        {
+        Update_Meetings_Call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 delaydialog.cancel();
-                if(response.isSuccessful())
-                {
-                    if(web_Socket.isOpen())
-                    {
+                if (response.isSuccessful()) {
+                    if (web_Socket.isOpen()) {
                         Gson gson = new Gson();
                         String json = gson.toJson(startSign);
                         byte[] bytess = json.getBytes();
                         web_Socket.send(ByteBuffer.wrap(bytess));
                     }
                     signature_dial.cancel();
-                }
-                else
-                {
-                    Toast.makeText(con,"Something Went wrong",Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(con, "Something Went wrong", Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -123,17 +111,16 @@ public class Request_Maker
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                 delaydialog.cancel();
                 signature_dial.cancel();
-                Toast.makeText(con,R.string.Server_down,Toast.LENGTH_LONG).show();
+                Toast.makeText(con, R.string.Server_down, Toast.LENGTH_LONG).show();
             }
         });
     }
 
 
-
-
     /**
      * Converts list of Attendees into a haspMap to allow better manipulation
      * of attendees including checking if there exist
+     *
      * @param ListofUserMeetings The list of Attendees for a particular Meeting
      * @return Returns a hashmap of Attendees
      */
@@ -146,7 +133,6 @@ public class Request_Maker
 
         return UserMeetingsHashMap;
     }
-
 
 
 }

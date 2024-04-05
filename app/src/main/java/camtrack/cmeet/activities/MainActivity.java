@@ -30,6 +30,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 
 
+import camtrack.cmeet.R;
 import camtrack.cmeet.R.id;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -52,6 +53,7 @@ import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.Events;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -82,9 +84,7 @@ public class MainActivity extends Fragment {
 
     MutableLiveData<List<event_model>> cmeet_item_listener;
     MainActivityEventFragment mainActivityEventFragment;
-    RoleFragment roleFragment;
 
-    matrices_fragment matricesFragment;
     Retrofit retrofitobj;
     public DialogBinding dialogBinding;
     public TextView starttext, endtext;
@@ -98,7 +98,6 @@ public class MainActivity extends Fragment {
     private GoogleAccountCredential googleAccountCredential;
     public static User user;
     public static String user_name;
-    Intent intent;
 
     public static List<Event> items() {
         return items;
@@ -118,12 +117,6 @@ public class MainActivity extends Fragment {
         super.onCreate(savedInstanceState);
         activityMainBinding = ActivityMainBinding.inflate(inflater, container, false);
         View view = activityMainBinding.getRoot();
-        /*FrameLayout backgroundLayout = activityMainBinding.getRoot();;
-        int statusBarColor = ((ColorDrawable) backgroundLayout.getBackground()).getColor();
-        Activity activity = getActivity();
-        Window window = activity.getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(statusBarColor);*/
         items_listener = new MutableLiveData<>();
         cmeet_item_listener = new MutableLiveData<>();
         account = GoogleSignIn.getLastSignedInAccount(requireContext());
@@ -159,7 +152,7 @@ public class MainActivity extends Fragment {
                     retrofitobj = Retrofit_Base_Class.getClient();
                     Request_Maker request_maker = new Request_Maker();
                     cmeet_event_list = cmeet_from_googleEvent(items);
-                    if (!items.equals(previous_items)) {
+                    if (!items.equals(previous_items) ) {
                         request_maker.store_todays_meets(retrofitobj, getContext(), cmeet_event_list, cmeet_item_listener);
                     }
                     previous_items = items;
@@ -181,7 +174,7 @@ public class MainActivity extends Fragment {
                     .commit();
         });
 
-        activityMainBinding.greetings.setText("Welcome " + user.getDisplayName());
+        activityMainBinding.greetings.setText( user.getDisplayName());
         activityMainBinding.bt2.setOnClickListener(v ->
         {
             activityMainBinding.MainActivityFrag.startShimmer();
@@ -227,7 +220,6 @@ public class MainActivity extends Fragment {
             }
         } catch (Exception e) {
             Log.d("MainActivity", "handleSignInResult: " + e.getMessage());
-            System.out.println("**************Line 192 Mainactivity" + e);
             Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
@@ -245,9 +237,8 @@ public class MainActivity extends Fragment {
                 .setApplicationName("cammeet")
                 .build();
 
-//DateTime.parseRfc3339("2023-05-09T13:40:09.000Z")
         try {
-            events = service.events().list("primary")
+            events = service.events().list(userid)
                     .setMaxResults(50)
                     .setTimeMin(Start)
                     .setTimeMax(end)
@@ -288,12 +279,10 @@ public class MainActivity extends Fragment {
         return items;
     }
 
-    private void getEvents_From_CmeetDB() {
 
-    }
 
     /**
-     * A function that maes an asynchronous call to get events
+     * A function that makes an asynchronous call to get events
      * from using google Api
      * the function sets a progressbar before creating the
      * new thread
@@ -462,13 +451,3 @@ public class MainActivity extends Fragment {
 
 }
 
-// do a call to the cmeet database if you ecounter an exception in getEvents
-
-
-// At line 128 after events have been filled by google and placed cmeet_eveent_list
-// cmeet_eveent_list is used to update cmeet database
-// Here what you rather do is get events for that day from cmeet db which where inserted from cmeet_eveent_list only if there
-// there were new, the events getten from cmeet db are returned and that is what is displayed in the fragment
-// this will imply you need to assert events from then to the end of that day after and ony after all events have been inserted
-// at line 161 uncomment activityMainBinding.greetings.setText("Welcome "+user.getDisplayName());
-// -> turn to your left, walk yellow building on your left on the second floor left apartment when you are facing building

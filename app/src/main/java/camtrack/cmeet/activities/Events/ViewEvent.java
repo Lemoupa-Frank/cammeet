@@ -317,6 +317,3 @@ public class ViewEvent extends AppCompatActivity {
     }
 
 }
-//remember to setVisibility of sign to Invisible
-
-// Also Add role as part of the message

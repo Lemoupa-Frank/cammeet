@@ -26,7 +26,7 @@
                 android:layout_height="45dp"
                 android:layout_gravity="start|center_vertical"
                 android:layout_marginEnd="65dp"
-                android:background="@null"
+                android:background="?android:attr/selectableItemBackground"
                 android:src="@drawable/baseline_home_24"
                 android:text="frag" />
 
@@ -35,7 +35,7 @@
                 android:layout_width="50dp"
                 android:layout_height="45dp"
                 android:layout_gravity="end|center_vertical"
-                android:background="@null"
+                android:background="?android:attr/selectableItemBackground"
                 android:src="@drawable/baseline_format_align_justify_24" />
         </LinearLayout>
 </FrameLayout>

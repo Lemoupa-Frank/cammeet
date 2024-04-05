@@ -92,22 +92,35 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-
-    <TextView
-        android:id="@+id/login"
-        android:layout_width="150dp"
-        android:layout_height="40dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="4dp"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardvies3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="33dp"
         android:background="@drawable/shaded_cylinder"
-        android:textIsSelectable="true"
-        android:gravity="center"
-        android:text="@string/action_sign_in_short"
-        android:textColor="@color/white"
-        android:textSize="18sp"
+        android:backgroundTint="@color/white"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+    <TextView
+        android:id="@+id/login"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="4dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:layout_margin="1dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:gravity="center"
+        android:text="@string/action_sign_in_short"
+        android:textColor="@color/darker_layout_background"
+        app:drawableEndCompat="@drawable/baseline_arrow_forward_24"
+        app:drawableTint="@color/darker_layout_background"
+        android:textSize="18sp" />
+    </androidx.cardview.widget.CardView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
